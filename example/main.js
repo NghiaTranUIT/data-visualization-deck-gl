@@ -22,34 +22,27 @@
 /* global console, process */
 /* global document, window */
 import 'babel-polyfill';
-
 import React from 'react';
 import ReactDOM from 'react-dom';
 import {createStore} from 'redux';
 import {Provider, connect} from 'react-redux';
 import autobind from 'autobind-decorator';
-
 import MapboxGLMap from 'react-map-gl';
 import {FPSStats} from 'react-stats';
 import LayerSelector from './layer-selector';
 import LayerInfo from './layer-info';
 import * as request from 'd3-request';
-
 import DeckGL from '../src/react/deckgl';
 import {ReflectionEffect} from '../src/experimental';
-
 import {updateMap, loadChoropleths, loadExtrudedChoropleths, loadHexagons,
 loadPoints, swapData} from './action'
 import { reducer } from './reducer'
+
 
 // ---- Default Settings ---- //
 /* eslint-disable no-process-env */
 const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
   'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw';
-
-const CHOROPLETHS_FILE = './example/data/sf.zip.geo.json';
-const EXTRUDED_CHOROPLETHS_FILE = './example/data/sf.zip.geo.json';
-const HEXAGONS_FILE = './example/data/hexagons.csv';
 const POINTS_FILE = './example/data/sf.bike.parking.csv';
 
 // ---- View ---- //
@@ -88,15 +81,6 @@ const ExampleApp = React.createClass({
       onDataLoaded(data);
     });
   },
-
-  _updateArcStrokeWidth() {
-    this.setState({arcStrokeWidth: 1});
-  },
-
-  _handleHexagonsLoaded(data) {
-    this.props.dispatch(loadHexagons(data));
-  },
-
    _handlePointsLoaded(data) {
     this.props.dispatch(loadPoints(data));
   },
@@ -177,15 +161,7 @@ const ExampleApp = React.createClass({
 function mapStateToProps(state) {
   return {
     mapViewState: state.mapViewState,
-    choropleths: state.choropleths,
-    extrudedChoropleths: state.extrudedChoropleths,
-    hexagons: state.hexagons,
     points: state.points,
-    arcs: state.arcs,
-    arcs2: state.arcs2,
-    lines: state.lines,
-    hexData: state.hexData,
-    hexData2: state.hexData2
   };
 }
 
