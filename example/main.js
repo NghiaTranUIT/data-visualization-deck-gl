@@ -53,30 +53,32 @@ const HEXAGONS_FILE = './example/data/hexagons.csv';
 const POINTS_FILE = './example/data/sf.bike.parking.csv';
 
 // ---- View ---- //
-class ExampleApp extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
+const ExampleApp = React.createClass({
+  propTypes: {
+  },
+
+  getInitialState() {
+    return {
       selectedHexagons: [],
       hoverHexagon: null,
       hoverPoint: null,
       hoverArc: null,
       hoverChoropleth: null,
       clickItem: null
-    };
+    }
+  },
 
-    this._effects = [new ReflectionEffect()];
-  }
+  _effects: [new ReflectionEffect()],
 
   componentWillMount() {
     this._handleResize();
     window.addEventListener('resize', this._handleResize);
     this._loadCsvFile(POINTS_FILE, this._handlePointsLoaded);
-  }
+  },
 
   componentWillUnmount() {
     window.removeEventListener('resize', this._handleResize);
-  }
+  },
 
   _loadCsvFile(path, onDataLoaded) {
     request.csv(path, function loadJson(error, data) {
@@ -85,39 +87,39 @@ class ExampleApp extends React.Component {
       }
       onDataLoaded(data);
     });
-  }
+  },
 
-  @autobind _updateArcStrokeWidth() {
+  _updateArcStrokeWidth() {
     this.setState({arcStrokeWidth: 1});
-  }
+  },
 
-  @autobind _handleHexagonsLoaded(data) {
+  _handleHexagonsLoaded(data) {
     this.props.dispatch(loadHexagons(data));
-  }
+  },
 
-  @autobind _handlePointsLoaded(data) {
+   _handlePointsLoaded(data) {
     this.props.dispatch(loadPoints(data));
-  }
+  },
 
-  @autobind _handleResize() {
+  _handleResize() {
     this.setState({width: window.innerWidth, height: window.innerHeight});
-  }
+  },
 
-  @autobind _handleViewportChanged(mapViewState) {
+  _handleViewportChanged(mapViewState) {
     if (mapViewState.pitch > 60) {
       mapViewState.pitch = 60;
     }
     this.props.dispatch(updateMap(mapViewState));
-  }
+  },
 
-  @autobind _onWebGLInitialized(gl) {
+  _onWebGLInitialized(gl) {
     gl.enable(gl.DEPTH_TEST);
     gl.depthFunc(gl.LEQUAL);
-  }
+  },
 
   _renderExamples() {
     return [];
-  }
+  },
 
   _renderOverlay() {
     const {points, mapViewState} = this.props;
@@ -140,7 +142,7 @@ class ExampleApp extends React.Component {
         effects={this._effects}
       />
     );
-  }
+  },
 
   _renderMap() {
     const {mapViewState} = this.props;
@@ -158,7 +160,7 @@ class ExampleApp extends React.Component {
         <FPSStats isActive/>
       </MapboxGLMap>
     );
-  }
+  },
 
   render() {
     return (
@@ -167,8 +169,9 @@ class ExampleApp extends React.Component {
         <LayerInfo { ...this.state }/>
       </div>
     );
-  }
-}
+  },
+
+})
 
 // redux states -> react props
 function mapStateToProps(state) {
