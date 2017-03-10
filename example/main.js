@@ -40,6 +40,11 @@ import LAYER_CATEGORIES, {DEFAULT_ACTIVE_LAYERS} from './layer-examples';
 import DeckGL from '../src/react/deckgl';
 import {ReflectionEffect} from '../src/experimental';
 
+import {updateMap, loadChoropleths, loadExtrudedChoropleths, loadHexagons,
+loadPoints, swapData} from './action'
+import { processHexagons, pointsToArcs, pointsToLines} from './helper'
+import { reducer } from './reducer'
+
 // ---- Default Settings ---- //
 /* eslint-disable no-process-env */
 const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
@@ -49,198 +54,6 @@ const CHOROPLETHS_FILE = './example/data/sf.zip.geo.json';
 const EXTRUDED_CHOROPLETHS_FILE = './example/data/sf.zip.geo.json';
 const HEXAGONS_FILE = './example/data/hexagons.csv';
 const POINTS_FILE = './example/data/sf.bike.parking.csv';
-
-const INITIAL_STATE = {
-  mapViewState: {
-    latitude: 37.751537058389985,
-    longitude: -122.42694203247012,
-    zoom: 11.5,
-    pitch: 0,
-    bearing: 0
-  },
-  choropleths: null,
-  extrudedChoropleths: null,
-  hexagons: null,
-  points: null,
-  arcs: null,
-  arcs2: null,
-  lines: null,
-  arcStrokeWidth: 1
-};
-
-// ---- Action ---- //
-function updateMap(mapViewState) {
-  return {type: 'UPDATE_MAP', mapViewState};
-}
-
-function loadChoropleths(choropleths) {
-  return {type: 'LOAD_CHOROPLETHS', choropleths};
-}
-
-function loadExtrudedChoropleths(extrudedChoropleths) {
-  return {type: 'LOAD_EXTRUDED_CHOROPLETHS', extrudedChoropleths};
-}
-
-function loadHexagons(hexagons) {
-  return {type: 'LOAD_HEXAGONS', hexagons};
-}
-
-function loadPoints(points) {
-  return {type: 'LOAD_POINTS', points};
-}
-
-// Swaps data props when clicked to trigger WebGLBuffer updates
-function swapData() {
-  return {type: 'SWAP_DATA'};
-}
-
-// ---- Reducer ---- //
-function reducer(state = INITIAL_STATE, action) {
-  switch (action.type) {
-  case 'UPDATE_MAP':
-    return {...state, mapViewState: action.mapViewState};
-  case 'LOAD_CHOROPLETHS':
-    return {...state, choropleths: action.choropleths};
-  case 'LOAD_EXTRUDED_CHOROPLETHS':
-    return {...state, extrudedChoropleths: action.extrudedChoropleths};
-  case 'LOAD_HEXAGONS': {
-    const {hexagons} = action;
-    const hexData2 = processHexagons(hexagons);
-    const hexData = hexData2.slice(hexData2.length / 2);
-    return {...state, hexagons, hexData, hexData2};
-  }
-  case 'LOAD_POINTS': {
-    const points = action.points.map(point => {
-      const coordString = point.COORDINATES;
-      const p0 = coordString.indexOf('(') + 1;
-      const p1 = coordString.indexOf(')');
-      const coords = coordString.slice(p0, p1).split(',');
-      return {
-        position: [Number(coords[1]), Number(coords[0]), 0],
-        color: [88, 9, 124],
-        radius: (Math.random() * (15 - 5 + 1) + 5) / 10
-      };
-    });
-
-    const arcs = pointsToArcs(points);
-    const arcs1 = arcs.slice(0, arcs.length / 2);
-    const arcs2 = arcs.slice(arcs.length / 2);
-    const lines = pointsToLines(points);
-    return {...state, points, arcs: arcs1, arcs2, lines};
-  }
-  case 'SWAP_DATA': {
-    state = {
-      ...state,
-      hexData: state.hexData2,
-      hexData2: state.hexData
-    };
-    return state;
-  }
-  default:
-    return state;
-  }
-}
-
-// redux states -> react props
-function mapStateToProps(state) {
-  return {
-    mapViewState: state.mapViewState,
-    choropleths: state.choropleths,
-    extrudedChoropleths: state.extrudedChoropleths,
-    hexagons: state.hexagons,
-    points: state.points,
-    arcs: state.arcs,
-    arcs2: state.arcs2,
-    lines: state.lines,
-    hexData: state.hexData,
-    hexData2: state.hexData2
-  };
-}
-
-// ---- Helpers ---- //
-
-function processHexagons(hexagons) {
-  const values = hexagons.map(hexagon => Number(hexagon.value));
-  const maxValue = Math.max(...values);
-
-  const data = hexagons.map(hexagon => ({
-    centroid: [
-      hexagon['centroid.x'],
-      hexagon['centroid.y']
-    ],
-    vertices: [
-      [Number(hexagon['v0.x']), Number(hexagon['v0.y'])],
-      [Number(hexagon['v1.x']), Number(hexagon['v1.y'])],
-      [Number(hexagon['v2.x']), Number(hexagon['v2.y'])],
-      [Number(hexagon['v3.x']), Number(hexagon['v3.y'])],
-      [Number(hexagon['v4.x']), Number(hexagon['v4.y'])],
-      [Number(hexagon['v5.x']), Number(hexagon['v5.y'])]
-    ],
-    color: [
-      Number(hexagon.value) / maxValue * 255,
-      Number(hexagon.value) / maxValue * 128,
-      Number(hexagon.value) / maxValue * 64
-    ],
-    elevation: Number(hexagon.value) / maxValue
-
-  }));
-  return data;
-}
-
-function pointsToArcs(points) {
-  return points.map((point, i) => {
-    if (i === points.length - 1) {
-      return {
-        sourcePosition: [0, 0],
-        targetPosition: [0, 0],
-        color: [35, 81, 128]
-      };
-    }
-
-    const source = point;
-    const target = points[i + 1];
-
-    return {
-      sourcePosition: source.position,
-      targetPosition: target.position,
-      color: [
-        i % 255,
-        255 - i % 255,
-        Math.floor(i / 255) % 255,
-        255
-      ]
-    };
-  });
-}
-
-function pointsToLines(points) {
-  return points.map((point, i) => {
-    if (i === points.length - 1) {
-      return {
-        sourcePosition: [0, 0, 0],
-        targetPosition: [0, 0, 0],
-        color: [35, 81, 128]
-      };
-    }
-
-    const source = point;
-    const target = points[i + 1];
-
-    return {
-      sourcePosition: [
-        source.position[0],
-        source.position[1],
-        Math.random() * 1000
-      ],
-      targetPosition: [
-        target.position[0],
-        target.position[1],
-        Math.random() * 1000
-      ],
-      color: [0, 0, 255]
-    };
-  });
-}
 
 // ---- View ---- //
 class ExampleApp extends React.Component {
@@ -490,6 +303,22 @@ class ExampleApp extends React.Component {
       </div>
     );
   }
+}
+
+// redux states -> react props
+function mapStateToProps(state) {
+  return {
+    mapViewState: state.mapViewState,
+    choropleths: state.choropleths,
+    extrudedChoropleths: state.extrudedChoropleths,
+    hexagons: state.hexagons,
+    points: state.points,
+    arcs: state.arcs,
+    arcs2: state.arcs2,
+    lines: state.lines,
+    hexData: state.hexData,
+    hexData2: state.hexData2
+  };
 }
 
 // ---- Main ---- //
