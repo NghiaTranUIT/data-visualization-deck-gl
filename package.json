@@ -35,6 +35,7 @@
     "lodash.flattendeep": "^4.4.0",
     "luma.gl": "^2.10.4",
     "save-pixels": "^2.3.0",
+    "scss": "^0.2.4",
     "viewport-mercator-project": "3.0.0-beta3"
   },
   "devDependencies": {

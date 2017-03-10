@@ -49,7 +49,7 @@ import {
 /* eslint-disable no-process-env */
 const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
   'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw';
-const SMALL_FLIGHT_DATA = './example/data/small-chuck-flight-data.csv';
+const SMALL_FLIGHT_DATA = './example/data/slight-small-chuck-flight-data_2.csv';
 const AIRPORT_DATA = './example/data/airports.csv';
 
 // ---- View ---- //

@@ -97,3 +97,18 @@ input[type=checkbox] {
 	filter: alpha(opacity=100);
 	opacity: 1;
 }
+
+#overlayControl {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  z-index: 99;
+  pointer-events: none;
+}
+
+.titleLabel {
+  padding: 1em;
+  margin-bottom: 1em;
+  width: 300px;
+  color: white;
+}
