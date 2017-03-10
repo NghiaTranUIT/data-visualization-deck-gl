@@ -19,6 +19,10 @@ export function loadPoints(points) {
   return {type: 'LOAD_POINTS', points};
 }
 
+export function loadAirport(airports) {
+  return {type: 'LOAD_AIRPORT', airports};
+}
+
 // Swaps data props when clicked to trigger WebGLBuffer updates
 export function swapData() {
   return {type: 'SWAP_DATA'};

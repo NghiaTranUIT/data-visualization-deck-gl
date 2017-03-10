@@ -35,28 +35,40 @@ import * as request from 'd3-request';
 import DeckGL from '../src/react/deckgl';
 import {ReflectionEffect} from '../src/experimental';
 import {updateMap, loadChoropleths, loadExtrudedChoropleths, loadHexagons,
-loadPoints, swapData} from './action'
+loadPoints, swapData, loadAirport} from './action'
 import { reducer } from './reducer'
-
+import {
+  ChoroplethLayer,
+  ScatterplotLayer,
+  ArcLayer,
+  LineLayer,
+  ScreenGridLayer
+} from '../src';
 
 // ---- Default Settings ---- //
 /* eslint-disable no-process-env */
 const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
   'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw';
-const POINTS_FILE = './example/data/sf.bike.parking.csv';
+const SMALL_FLIGHT_DATA = './example/data/small-chuck-flight-data.csv';
+const AIRPORT_DATA = './example/data/airports.csv';
 
 // ---- View ---- //
 const ExampleApp = React.createClass({
   propTypes: {
 
   },
-  
+
   _effects: [new ReflectionEffect()],
 
   componentWillMount() {
     this._handleResize();
     window.addEventListener('resize', this._handleResize);
-    this._loadCsvFile(POINTS_FILE, this._handlePointsLoaded);
+
+    this._loadCsvFile(AIRPORT_DATA, (data)=>{
+      this._handleAirportLoaded(data)
+      this._loadCsvFile(SMALL_FLIGHT_DATA, this._handlePointsLoaded);
+    });
+
   },
 
   componentWillUnmount() {
@@ -71,9 +83,14 @@ const ExampleApp = React.createClass({
       onDataLoaded(data);
     });
   },
+
    _handlePointsLoaded(data) {
     this.props.dispatch(loadPoints(data));
   },
+
+  _handleAirportLoaded(data) {
+    this.props.dispatch(loadAirport(data));
+ },
 
   _handleResize() {
     this.setState({width: window.innerWidth, height: window.innerHeight});
@@ -91,16 +108,25 @@ const ExampleApp = React.createClass({
     gl.depthFunc(gl.LEQUAL);
   },
 
-  _renderExamples() {
-    return [];
+  _renderFlightLayer() {
+
+    const {points, airports} = this.props
+    return [
+      new ArcLayer({
+        id: 'arc',
+        data: points,
+        strokeWidth: 3,
+        color: [88, 9, 124],
+      })
+    ];
   },
 
   _renderOverlay() {
-    const {points, mapViewState} = this.props;
+    const {points, airports, mapViewState} = this.props;
     const {width, height} = this.state;
 
     // wait until data is ready before rendering
-    if (!points ) {
+    if (!points || !airports) {
       return [];
     }
 
@@ -112,7 +138,7 @@ const ExampleApp = React.createClass({
         debug
         {...mapViewState}
         onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderExamples()}
+        layers={this._renderFlightLayer()}
         effects={this._effects}
       />
     );
@@ -127,6 +153,7 @@ const ExampleApp = React.createClass({
         mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
         width={width}
         height={height}
+        mapStyle='mapbox://styles/mapbox/dark-v9'
         perspectiveEnabled
         { ...mapViewState }
         onChangeViewport={this._handleViewportChanged}>
@@ -137,7 +164,9 @@ const ExampleApp = React.createClass({
   },
 
   render() {
-    const layerInfoProps = {numberFlights: 0}
+    const {points} = this.props
+    const length = points === null ? 0 : points.length
+    const layerInfoProps = {numberFlights: length}
     return (
       <div>
         { this._renderMap() }
@@ -153,6 +182,7 @@ function mapStateToProps(state) {
   return {
     mapViewState: state.mapViewState,
     points: state.points,
+    airports: state.airports,
   };
 }
 

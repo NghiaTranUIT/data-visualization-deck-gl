@@ -9,6 +9,7 @@ const INITIAL_STATE = {
     bearing: 0
   },
   points: null,
+  airports: null,
 };
 
 
@@ -18,7 +19,31 @@ export function reducer(state = INITIAL_STATE, action) {
   case 'UPDATE_MAP':
     return {...state, mapViewState: action.mapViewState};
   case 'LOAD_POINTS': {
-    return {...state}
+
+    // Map corrdinate from air-port
+    console.log(state.airports)
+    console.log(action.points[0])
+
+    const newPoints = action.points.map((item)=>{
+      const originalAirport = item.ORIGIN_AIRPORT
+      const destinationAirport = item.DESTINATION_AIRPORT
+      const line = {
+        sourcePosition: state.airports[originalAirport],
+        targetPosition: state.airports[destinationAirport],
+      }
+      return line
+    })
+
+    return {...state, points: newPoints}
+  }
+  case 'LOAD_AIRPORT': {
+
+    let dict = {}
+    action.airports.forEach((item, index)=>{
+      dict[item.IATA_CODE] = [Number(item.LONGITUDE), Number(item.LATITUDE)]
+    })
+
+    return {...state, airports: dict}
   }
   default:
     return state;
