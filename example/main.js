@@ -48,19 +48,9 @@ const POINTS_FILE = './example/data/sf.bike.parking.csv';
 // ---- View ---- //
 const ExampleApp = React.createClass({
   propTypes: {
-  },
 
-  getInitialState() {
-    return {
-      selectedHexagons: [],
-      hoverHexagon: null,
-      hoverPoint: null,
-      hoverArc: null,
-      hoverChoropleth: null,
-      clickItem: null
-    }
   },
-
+  
   _effects: [new ReflectionEffect()],
 
   componentWillMount() {
@@ -147,10 +137,11 @@ const ExampleApp = React.createClass({
   },
 
   render() {
+    const layerInfoProps = {numberFlights: 0}
     return (
       <div>
         { this._renderMap() }
-        <LayerInfo { ...this.state }/>
+        <LayerInfo {...layerInfoProps}/>
       </div>
     );
   },
