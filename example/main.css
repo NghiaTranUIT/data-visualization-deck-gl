@@ -98,17 +98,27 @@ input[type=checkbox] {
 	opacity: 1;
 }
 
-#overlayControl {
-  position: absolute;
-  bottom: 20px;
-  left: 20px;
-  z-index: 99;
-  pointer-events: none;
+.overlay-contol-container {
+	position: absolute;
+	bottom: 0;
+	padding-bottom: 10px;
+	padding-left: 10px;
+	padding-top: 10px;
+	z-index: 99;
+	pointer-events: none;
+	width: 200px;
+	background-color: rgba(0,0,0, 0.2);
 }
 
-.titleLabel {
-  padding: 1em;
-  margin-bottom: 1em;
+#overlay-control {
+	display: inline-block;
+}
+
+#overlay-map-control {
+  display: inline-block;
+}
+
+.title-label {
   width: 300px;
   color: white;
 }

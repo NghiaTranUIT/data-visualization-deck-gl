@@ -15,3 +15,7 @@ export function loadAirport(airports) {
 export function loadTrees(data) {
   return {type: 'LOAD_TREES', data}
 }
+
+export function selectMode(mode) {
+  return {type: 'SELECT_MODE', mode}
+}

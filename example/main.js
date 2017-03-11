@@ -36,6 +36,7 @@ import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
 import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
 import { ArcLayer,ScreenGridLayer } from '../src'
+import { MapSelection } from './map-selection/map-selection'
 import {updateMap, loadFlightDataPoints, loadAirport, loadTrees} from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
 
@@ -204,19 +205,31 @@ const ExampleApp = React.createClass({
   },
 
   render() {
-    const { flightArcs, trees, mapMode } = this.props
+    const { flightArcs, trees, mapMode, airports } = this.props
+    console.log(airports)
     const layerInfoProps = {
-      numberFlights: 0,
-      numberTrees: 0,
+      numberFlights: this._getLength(flightArcs),
+      numberTrees: this._getLength(trees),
+      numberAirport: this._getLength(airports),
       mode: mapMode,
     }
 
     return (
       <div>
         { this._renderMap() }
-        <LayerInfo {...layerInfoProps}/>
+        <div className='overlay-contol-container'>
+          <MapSelection/>
+          <LayerInfo {...layerInfoProps}/>
+        </div>
       </div>
-    );
+    )
+  },
+
+  _getLength(data) {
+    if (data === null) {
+      return 0
+    }
+    return Object.keys(data).length
   },
 
 })

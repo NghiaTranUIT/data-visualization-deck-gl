@@ -29,7 +29,11 @@ const INITIAL_STATE = {
 export function reducer(state = INITIAL_STATE, action) {
   switch (action.type) {
   case 'UPDATE_MAP':
-    return {...state, mapViewState: action.mapViewState};
+    return {...state, mapViewState: action.mapViewState}
+
+  case 'SELECT_MODE':
+    return {...state, mapMode: action.mode}
+
   case 'LOAD_FLIGHT_POINT': {
     const flightArcs = action.points.map((item)=>{
       const originalAirport = item.ORIGIN_AIRPORT
@@ -41,6 +45,7 @@ export function reducer(state = INITIAL_STATE, action) {
     })
     return {...state, flightArcs}
   }
+
   case 'LOAD_AIRPORT': {
     let airports = {}
     action.airports.forEach((item, index)=>{
@@ -49,6 +54,7 @@ export function reducer(state = INITIAL_STATE, action) {
 
     return {...state, airports}
   }
+
   case 'LOAD_TREES': {
     let trees = action.data.map((item)=>{
       const lat = item.latitude
