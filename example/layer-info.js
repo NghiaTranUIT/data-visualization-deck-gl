@@ -6,15 +6,16 @@ import './layer_info.scss'
 
 const LayerInfo = React.createClass({
   propTypes: {
-    numberFlights: React.PropTypes.number
+    numberFlights: React.PropTypes.number,
+    numberVisa: React.PropTypes.number
   },
 
   render() {
-    const {numberFlights} = this.props
+    const {numberFlights, numberVisa} = this.props
     return (
       <div id="overlayControl">
         <div className="titleLabel">
-          Number of flight {numberFlights}
+          Trees count: {numberVisa}
         </div>
       </div>
     )

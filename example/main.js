@@ -35,8 +35,9 @@ import * as request from 'd3-request';
 import DeckGL from '../src/react/deckgl';
 import {ReflectionEffect} from '../src/experimental';
 import {interpolateViridis} from 'd3-scale';
-import {updateMap, loadFlightDataPoints, swapData, loadAirport} from './action'
+import {updateMap, loadFlightDataPoints, swapData, loadAirport, loadVisaH1B} from './action'
 import { reducer } from './reducer'
+import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
 import {
   ChoroplethLayer,
   ScatterplotLayer,
@@ -45,12 +46,14 @@ import {
   ScreenGridLayer
 } from '../src';
 
+
 // ---- Default Settings ---- //
 /* eslint-disable no-process-env */
 const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
   'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw';
 const SMALL_FLIGHT_DATA = './example/data/slight-small-chuck-flight-data_2.csv';
 const AIRPORT_DATA = './example/data/airports.csv';
+const VISA_H1B_DATA = './example/data/tree_census.csv'
 
 // ---- View ---- //
 const ExampleApp = React.createClass({
@@ -70,6 +73,8 @@ const ExampleApp = React.createClass({
     //   this._loadCsvFile(SMALL_FLIGHT_DATA, this._handleFlightPointsLoaded);
     // });
 
+    // Load VISA H1B
+    this._loadCsvFile(VISA_H1B_DATA, this._handleVISAH1BDataLoaded)
   },
 
   componentWillUnmount() {
@@ -92,6 +97,10 @@ const ExampleApp = React.createClass({
   _handleAirportLoaded(data) {
     this.props.dispatch(loadAirport(data));
  },
+
+ _handleVISAH1BDataLoaded(data) {
+   this.props.dispatch(loadVisaH1B(data));
+},
 
   _handleResize() {
     this.setState({width: window.innerWidth, height: window.innerHeight});
@@ -123,28 +132,34 @@ const ExampleApp = React.createClass({
   },
 
   _renderVISAH1Layer() {
-
-    const {flightArcs, airports} = this.props
+    const { visah1bDatas } = this.props
+    console.log(visah1bDatas[0])
     return [
-      new ArcLayer({
-        id: 'arc',
-        data: flightArcs,
-        strokeWidth: 3,
-        color: [88, 9, 124],
+      new ScreenGridLayer({
+        id: 'gird',
+        data: visah1bDatas,
+        minColor: [0, 0, 0, 0],
+        unitWidth: 10,
+        unitHeight: 10,
       })
     ];
   },
 
   _renderOverlay() {
-    const {flightArcs, airports, mapViewState} = this.props;
+    const {flightArcs, airports, mapViewState, visah1bDatas} = this.props;
     const {width, height} = this.state;
 
     // wait until data is ready before rendering
-    if (!flightArcs || !airports) {
+    // if (!flightArcs || !airports || !visah1bDatas) {
+    //   return [];
+    // }
+
+    if ( !visah1bDatas) {
       return [];
     }
 
     console.log(interpolateViridis(0.2))
+    console.log("_renderOverlay")
 
     return (
       <DeckGL
@@ -160,6 +175,21 @@ const ExampleApp = React.createClass({
     );
   },
 
+  _renderHeatMap() {
+    const {flightArcs, airports, mapViewState, visah1bDatas} = this.props;
+    const {width, height} = this.state;
+    const size = 60
+    if ( !visah1bDatas) {
+      return [];
+    }
+    return (
+      <HeatmapOverlay locations={visah1bDatas} {...mapViewState}
+        width={width}
+        height={height}
+         />
+    )
+  },
+
   _renderMap() {
     const {mapViewState} = this.props;
     const {width, height} = this.state;
@@ -173,16 +203,21 @@ const ExampleApp = React.createClass({
         perspectiveEnabled
         { ...mapViewState }
         onChangeViewport={this._handleViewportChanged}>
-        { this._renderOverlay() }
+        { this._renderHeatMap()}
         <FPSStats isActive/>
       </MapboxGLMap>
     );
   },
 
   render() {
-    const {flightArcs} = this.props
-    const length = flightArcs === null ? 0 : flightArcs.length
-    const layerInfoProps = {numberFlights: length}
+    const {flightArcs, visah1bDatas} = this.props
+    const lengthFlight = flightArcs === null ? 0 : flightArcs.length
+    const lengthVisa = visah1bDatas == null ? 0 : visah1bDatas.length
+    const layerInfoProps = {
+      numberFlights: lengthFlight,
+      numberVisa: lengthVisa,
+      }
+
     return (
       <div>
         { this._renderMap() }
@@ -199,6 +234,7 @@ function mapStateToProps(state) {
     mapViewState: state.mapViewState,
     flightArcs: state.flightArcs,
     airports: state.airports,
+    visah1bDatas: state.visah1bDatas,
   };
 }
 

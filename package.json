@@ -35,6 +35,8 @@
     "gl-matrix": "^2.3.2",
     "lodash.flattendeep": "^4.4.0",
     "luma.gl": "^2.10.4",
+    "r-dom": "^2.3.2",
+    "react-map-gl-heatmap-overlay": "^1.1.2",
     "save-pixels": "^2.3.0",
     "scss": "^0.2.4",
     "viewport-mercator-project": "3.0.0-beta3"
