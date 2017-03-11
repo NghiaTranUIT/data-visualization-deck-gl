@@ -8,7 +8,7 @@ const INITIAL_STATE = {
     pitch: 0,
     bearing: 0
   },
-  points: null,
+  flightArcs: null,
   airports: null,
 };
 
@@ -18,7 +18,7 @@ export function reducer(state = INITIAL_STATE, action) {
   switch (action.type) {
   case 'UPDATE_MAP':
     return {...state, mapViewState: action.mapViewState};
-  case 'LOAD_POINTS': {
+  case 'LOAD_FLIGHT_POINT': {
 
     // Map corrdinate from air-port
     console.log(state.airports)
@@ -34,7 +34,7 @@ export function reducer(state = INITIAL_STATE, action) {
       return line
     })
 
-    return {...state, points: newPoints}
+    return {...state, flightArcs: newPoints}
   }
   case 'LOAD_AIRPORT': {
 

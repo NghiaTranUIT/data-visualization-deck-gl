@@ -34,8 +34,8 @@ import LayerInfo from './layer-info';
 import * as request from 'd3-request';
 import DeckGL from '../src/react/deckgl';
 import {ReflectionEffect} from '../src/experimental';
-import {updateMap, loadChoropleths, loadExtrudedChoropleths, loadHexagons,
-loadPoints, swapData, loadAirport} from './action'
+import {interpolateViridis} from 'd3-scale';
+import {updateMap, loadFlightDataPoints, swapData, loadAirport} from './action'
 import { reducer } from './reducer'
 import {
   ChoroplethLayer,
@@ -64,10 +64,11 @@ const ExampleApp = React.createClass({
     this._handleResize();
     window.addEventListener('resize', this._handleResize);
 
-    this._loadCsvFile(AIRPORT_DATA, (data)=>{
-      this._handleAirportLoaded(data)
-      this._loadCsvFile(SMALL_FLIGHT_DATA, this._handlePointsLoaded);
-    });
+    // Load Flight Data
+    // this._loadCsvFile(AIRPORT_DATA, (data)=>{
+    //   this._handleAirportLoaded(data)
+    //   this._loadCsvFile(SMALL_FLIGHT_DATA, this._handleFlightPointsLoaded);
+    // });
 
   },
 
@@ -84,8 +85,8 @@ const ExampleApp = React.createClass({
     });
   },
 
-   _handlePointsLoaded(data) {
-    this.props.dispatch(loadPoints(data));
+   _handleFlightPointsLoaded(data) {
+    this.props.dispatch(loadFlightDataPoints(data));
   },
 
   _handleAirportLoaded(data) {
@@ -110,11 +111,24 @@ const ExampleApp = React.createClass({
 
   _renderFlightLayer() {
 
-    const {points, airports} = this.props
+    const {flightArcs, airports} = this.props
     return [
       new ArcLayer({
         id: 'arc',
-        data: points,
+        data: flightArcs,
+        strokeWidth: 3,
+        color: [88, 9, 124],
+      })
+    ];
+  },
+
+  _renderVISAH1Layer() {
+
+    const {flightArcs, airports} = this.props
+    return [
+      new ArcLayer({
+        id: 'arc',
+        data: flightArcs,
         strokeWidth: 3,
         color: [88, 9, 124],
       })
@@ -122,13 +136,15 @@ const ExampleApp = React.createClass({
   },
 
   _renderOverlay() {
-    const {points, airports, mapViewState} = this.props;
+    const {flightArcs, airports, mapViewState} = this.props;
     const {width, height} = this.state;
 
     // wait until data is ready before rendering
-    if (!points || !airports) {
+    if (!flightArcs || !airports) {
       return [];
     }
+
+    console.log(interpolateViridis(0.2))
 
     return (
       <DeckGL
@@ -138,7 +154,7 @@ const ExampleApp = React.createClass({
         debug
         {...mapViewState}
         onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderFlightLayer()}
+        layers={this._renderVISAH1Layer()}
         effects={this._effects}
       />
     );
@@ -164,8 +180,8 @@ const ExampleApp = React.createClass({
   },
 
   render() {
-    const {points} = this.props
-    const length = points === null ? 0 : points.length
+    const {flightArcs} = this.props
+    const length = flightArcs === null ? 0 : flightArcs.length
     const layerInfoProps = {numberFlights: length}
     return (
       <div>
@@ -181,7 +197,7 @@ const ExampleApp = React.createClass({
 function mapStateToProps(state) {
   return {
     mapViewState: state.mapViewState,
-    points: state.points,
+    flightArcs: state.flightArcs,
     airports: state.airports,
   };
 }
