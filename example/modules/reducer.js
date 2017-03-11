@@ -1,4 +1,4 @@
-import { processHexagons, pointsToArcs, pointsToLines} from './helper'
+import { MapMode } from '../constants'
 
 const SF_LOCATION = {
   latitude: 37.751537058389985,
@@ -20,7 +20,8 @@ const INITIAL_STATE = {
   },
   flightArcs: null,
   airports: null,
-  visah1bDatas: null,
+  trees: null,
+  mapMode: MapMode.NONE,
 };
 
 
@@ -30,44 +31,34 @@ export function reducer(state = INITIAL_STATE, action) {
   case 'UPDATE_MAP':
     return {...state, mapViewState: action.mapViewState};
   case 'LOAD_FLIGHT_POINT': {
-
-    // Map corrdinate from air-port
-    console.log(state.airports)
-    console.log(action.points[0])
-
-    const newPoints = action.points.map((item)=>{
+    const flightArcs = action.points.map((item)=>{
       const originalAirport = item.ORIGIN_AIRPORT
       const destinationAirport = item.DESTINATION_AIRPORT
-      const line = {
+      return {
         sourcePosition: state.airports[originalAirport],
         targetPosition: state.airports[destinationAirport],
       }
-      return line
     })
-
-    return {...state, flightArcs: newPoints}
+    return {...state, flightArcs}
   }
   case 'LOAD_AIRPORT': {
-
-    let dict = {}
+    let airports = {}
     action.airports.forEach((item, index)=>{
-      dict[item.IATA_CODE] = [Number(item.LONGITUDE), Number(item.LATITUDE)]
+      airports[item.IATA_CODE] = [Number(item.LONGITUDE), Number(item.LATITUDE)]
     })
 
-    return {...state, airports: dict}
+    return {...state, airports}
   }
-  case 'LOAD_VISA_H1B': {
-    let visah1bDatas = action.data.map((item)=>{
+  case 'LOAD_TREES': {
+    let trees = action.data.map((item)=>{
       const lat = item.latitude
       const long = item.longitude
-      const position = {
+      return {
         longitude: Number(long),
         latitude: Number(lat),
       }
-      return position
     })
-
-    return {...state, visah1bDatas}
+    return {...state, trees}
   }
 
   default:

@@ -21,39 +21,23 @@
 /* eslint-disable no-console */
 /* global console, process */
 /* global document, window */
-import 'babel-polyfill';
-import React from 'react';
-import ReactDOM from 'react-dom';
-import {createStore} from 'redux';
-import {Provider, connect} from 'react-redux';
-import autobind from 'autobind-decorator';
-import MapboxGLMap from 'react-map-gl';
-import {FPSStats} from 'react-stats';
-import LayerSelector from './layer-selector';
-import LayerInfo from './layer-info';
-import * as request from 'd3-request';
-import DeckGL from '../src/react/deckgl';
-import {ReflectionEffect} from '../src/experimental';
-import {interpolateViridis} from 'd3-scale';
-import {updateMap, loadFlightDataPoints, swapData, loadAirport, loadVisaH1B} from './action'
-import { reducer } from './reducer'
+import 'babel-polyfill'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import {createStore} from 'redux'
+import {Provider, connect} from 'react-redux'
+import MapboxGLMap from 'react-map-gl'
+import {FPSStats} from 'react-stats'
+import LayerInfo from './info/layer-info'
+import * as request from 'd3-request'
+import DeckGL from '../src/react/deckgl'
+import {ReflectionEffect} from '../src/experimental'
+import {interpolateViridis} from 'd3-scale'
+import { reducer } from './modules/reducer'
 import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
-import {
-  ChoroplethLayer,
-  ScatterplotLayer,
-  ArcLayer,
-  LineLayer,
-  ScreenGridLayer
-} from '../src';
-
-
-// ---- Default Settings ---- //
-/* eslint-disable no-process-env */
-const MAPBOX_ACCESS_TOKEN = process.env.MAPBOX_ACCESS_TOKEN ||
-  'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw';
-const SMALL_FLIGHT_DATA = './example/data/slight-small-chuck-flight-data_2.csv';
-const AIRPORT_DATA = './example/data/airports.csv';
-const VISA_H1B_DATA = './example/data/tree_census.csv'
+import { ArcLayer,ScreenGridLayer } from '../src'
+import {updateMap, loadFlightDataPoints, loadAirport, loadTrees} from './modules/action'
+import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
 
 // ---- View ---- //
 const ExampleApp = React.createClass({
@@ -68,13 +52,13 @@ const ExampleApp = React.createClass({
     window.addEventListener('resize', this._handleResize);
 
     // Load Flight Data
-    // this._loadCsvFile(AIRPORT_DATA, (data)=>{
-    //   this._handleAirportLoaded(data)
-    //   this._loadCsvFile(SMALL_FLIGHT_DATA, this._handleFlightPointsLoaded);
-    // });
+    this._loadCsvFile(AIRPORT_DATA, (data)=>{
+      this.props.dispatch(loadAirport(data))
+      this._loadCsvFile(SMALL_FLIGHT_DATA, (data)=>{this.props.dispatch(loadFlightDataPoints(data))})
+    });
 
-    // Load VISA H1B
-    this._loadCsvFile(VISA_H1B_DATA, this._handleVISAH1BDataLoaded)
+    // Load Tree
+    this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
   },
 
   componentWillUnmount() {
@@ -90,27 +74,15 @@ const ExampleApp = React.createClass({
     });
   },
 
-   _handleFlightPointsLoaded(data) {
-    this.props.dispatch(loadFlightDataPoints(data));
-  },
-
-  _handleAirportLoaded(data) {
-    this.props.dispatch(loadAirport(data));
- },
-
- _handleVISAH1BDataLoaded(data) {
-   this.props.dispatch(loadVisaH1B(data));
-},
-
   _handleResize() {
     this.setState({width: window.innerWidth, height: window.innerHeight});
   },
 
   _handleViewportChanged(mapViewState) {
     if (mapViewState.pitch > 60) {
-      mapViewState.pitch = 60;
+      mapViewState.pitch = 60
     }
-    this.props.dispatch(updateMap(mapViewState));
+    this.props.dispatch(updateMap(mapViewState))
   },
 
   _onWebGLInitialized(gl) {
@@ -119,7 +91,6 @@ const ExampleApp = React.createClass({
   },
 
   _renderFlightLayer() {
-
     const {flightArcs, airports} = this.props
     return [
       new ArcLayer({
@@ -131,13 +102,12 @@ const ExampleApp = React.createClass({
     ];
   },
 
-  _renderVISAH1Layer() {
-    const { visah1bDatas } = this.props
-    console.log(visah1bDatas[0])
+  _renderTreeLayer() {
+    const { trees } = this.props
     return [
       new ScreenGridLayer({
         id: 'gird',
-        data: visah1bDatas,
+        data: trees,
         minColor: [0, 0, 0, 0],
         unitWidth: 10,
         unitHeight: 10,
@@ -145,22 +115,13 @@ const ExampleApp = React.createClass({
     ];
   },
 
-  _renderOverlay() {
-    const {flightArcs, airports, mapViewState, visah1bDatas} = this.props;
-    const {width, height} = this.state;
+  _renderFlightGLSLOverlay() {
+    return null
+  },
 
-    // wait until data is ready before rendering
-    // if (!flightArcs || !airports || !visah1bDatas) {
-    //   return [];
-    // }
-
-    if ( !visah1bDatas) {
-      return [];
-    }
-
-    console.log(interpolateViridis(0.2))
-    console.log("_renderOverlay")
-
+  _renderFlightOverlay() {
+    const {flightArcs, airports, mapViewState} = this.props
+    const {width, height} = this.state
     return (
       <DeckGL
         id="default-deckgl-overlay"
@@ -169,31 +130,64 @@ const ExampleApp = React.createClass({
         debug
         {...mapViewState}
         onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderVISAH1Layer()}
+        layers={this._renderTreeLayer()}
         effects={this._effects}
       />
     );
   },
 
-  _renderHeatMap() {
-    const {flightArcs, airports, mapViewState, visah1bDatas} = this.props;
-    const {width, height} = this.state;
-    const size = 60
-    if ( !visah1bDatas) {
-      return [];
-    }
+  _renderTreesOverlay() {
+    const { mapViewState, trees } = this.props
+    const { width, height } = this.state
     return (
-      <HeatmapOverlay locations={visah1bDatas} {...mapViewState}
+      <DeckGL
+        id="default-deckgl-overlay"
         width={width}
         height={height}
-         />
+        debug
+        {...mapViewState}
+        onWebGLInitialized={ this._onWebGLInitialized }
+        layers={this._renderTreeLayer()}
+        effects={this._effects}
+      />
+    );
+  },
+
+  _renderTreesHeatMapOverlay() {
+    const { mapViewState, trees } = this.props
+    const { width, height } = this.state
+    return (
+      <HeatmapOverlay
+        locations={trees}
+        {...mapViewState}
+        width={width}
+        height={height}/>
+    )
+  },
+
+  _renderVisualizationOverlay() {
+    const { mapMode } = this.props
+
+    // wait until data is ready before rendering
+    if (flightArcs === null|| airports === null || trees === null) {
+      return []
+    }
+
+    return (
+      <div>
+        { mapMode === MapMode.TREES && this._renderTreesOverlay() }
+        { mapMode === MapMode.TREES_HEATMAP && this._renderTreesHeatMapOverlay() }
+        { mapMode === MapMode.FLIGHT && this._renderFlightOverlay() }
+        { mapMode === MapMode.FLIGHT_GLSL && this._renderFlightGLSLOverlay() }
+      </div>
     )
   },
 
   _renderMap() {
-    const {mapViewState} = this.props;
-    const {width, height} = this.state;
-
+    const { mapViewState, mapMode } = this.props
+    const { width, height } = this.state
+    const isActiveOverlay = mapMode !== MapMode.NONE
+    console.log('isActiveOverlay = ', isActiveOverlay)
     return (
       <MapboxGLMap
         mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
@@ -203,20 +197,19 @@ const ExampleApp = React.createClass({
         perspectiveEnabled
         { ...mapViewState }
         onChangeViewport={this._handleViewportChanged}>
-        { this._renderHeatMap()}
+        {isActiveOverlay && this._renderVisualizationOverlay()}
         <FPSStats isActive/>
       </MapboxGLMap>
     );
   },
 
   render() {
-    const {flightArcs, visah1bDatas} = this.props
-    const lengthFlight = flightArcs === null ? 0 : flightArcs.length
-    const lengthVisa = visah1bDatas == null ? 0 : visah1bDatas.length
+    const { flightArcs, trees, mapMode } = this.props
     const layerInfoProps = {
-      numberFlights: lengthFlight,
-      numberVisa: lengthVisa,
-      }
+      numberFlights: 0,
+      numberTrees: 0,
+      mode: mapMode,
+    }
 
     return (
       <div>
@@ -234,8 +227,9 @@ function mapStateToProps(state) {
     mapViewState: state.mapViewState,
     flightArcs: state.flightArcs,
     airports: state.airports,
-    visah1bDatas: state.visah1bDatas,
-  };
+    trees: state.trees,
+    mapMode: state.mapMode,
+  }
 }
 
 // ---- Main ---- //
