@@ -14,6 +14,7 @@ export const MapSelection = React.createClass({
   _handleChangeChk(evt, mode) {
     const { mapMode } = this.props
     if (mode === mapMode) {
+      this.props.selectModeFunc(MapMode.NONE)
       return
     }
     this.props.selectModeFunc(mode)

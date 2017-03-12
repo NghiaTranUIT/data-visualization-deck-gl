@@ -32,8 +32,21 @@ export function reducer(state = INITIAL_STATE, action) {
     return {...state, mapViewState: action.mapViewState}
 
   case 'SELECT_MODE':
-    console.log(action.mode)
-    return {...state, mapMode: action.mode}
+  const mapViewState = state.mapViewState
+
+    // Move to NY
+    if (action.mode === MapMode.TREES || action.mode === MapMode.TREES_HEATMAP) {
+      mapViewState.latitude = NY_LOCATION.latitude
+      mapViewState.longitude = NY_LOCATION.longitude
+    }
+
+    // Move to SF
+    if (action.mode === MapMode.FLIGHT || action.mode === MapMode.FLIGHT_GLSL) {
+      mapViewState.latitude = SF_LOCATION.latitude
+      mapViewState.longitude = SF_LOCATION.longitude
+    }
+
+    return {...state, mapViewState, mapMode: action.mode}
 
   case 'LOAD_FLIGHT_POINT': {
     const flightArcs = action.points.map((item)=>{

@@ -131,7 +131,7 @@ const ExampleApp = React.createClass({
         debug
         {...mapViewState}
         onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderTreeLayer()}
+        layers={this._renderFlightLayer()}
         effects={this._effects}
       />
     );
@@ -162,7 +162,8 @@ const ExampleApp = React.createClass({
         locations={trees}
         {...mapViewState}
         width={width}
-        height={height}/>
+        height={height}
+        lngLatAccessor={(tree) => [tree['position'][0], tree['position'][1]]}/>
     )
   },
 
