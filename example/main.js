@@ -37,7 +37,7 @@ import { reducer } from './modules/reducer'
 import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
 import { ArcLayer,ScreenGridLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
-import {updateMap, loadFlightDataPoints, loadAirport, loadTrees} from './modules/action'
+import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
 
 // ---- View ---- //
@@ -167,7 +167,7 @@ const ExampleApp = React.createClass({
   },
 
   _renderVisualizationOverlay() {
-    const { mapMode } = this.props
+    const { flightArcs, airports, mapMode, trees } = this.props
 
     // wait until data is ready before rendering
     if (flightArcs === null|| airports === null || trees === null) {
@@ -206,19 +206,20 @@ const ExampleApp = React.createClass({
 
   render() {
     const { flightArcs, trees, mapMode, airports } = this.props
-    console.log(airports)
     const layerInfoProps = {
       numberFlights: this._getLength(flightArcs),
       numberTrees: this._getLength(trees),
       numberAirport: this._getLength(airports),
       mode: mapMode,
     }
-
+    const mapSelectionProps = {
+      selectModeFunc: this._handleSelectMode
+    }
     return (
       <div>
         { this._renderMap() }
         <div className='overlay-contol-container'>
-          <MapSelection/>
+          <MapSelection {...mapSelectionProps}/>
           <LayerInfo {...layerInfoProps}/>
         </div>
       </div>
@@ -230,6 +231,10 @@ const ExampleApp = React.createClass({
       return 0
     }
     return Object.keys(data).length
+  },
+
+  _handleSelectMode(mode) {
+    this.props.dispatch(selectMode(mode))
   },
 
 })

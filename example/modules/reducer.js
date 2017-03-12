@@ -32,6 +32,7 @@ export function reducer(state = INITIAL_STATE, action) {
     return {...state, mapViewState: action.mapViewState}
 
   case 'SELECT_MODE':
+    console.log(action.mode)
     return {...state, mapMode: action.mode}
 
   case 'LOAD_FLIGHT_POINT': {
