@@ -4,7 +4,7 @@ import { MapMode } from '../constants'
 
 export const MapSelection = React.createClass({
   propTypes: {
-    mapMode: React.PropTypes.object,
+    mapMode: React.PropTypes.string,
 
     // Weird why dispatch props didn't working
     // Temporary solution
@@ -12,11 +12,16 @@ export const MapSelection = React.createClass({
   },
 
   _handleChangeChk(evt, mode) {
+    const { mapMode } = this.props
+    if (mode === mapMode) {
+      return
+    }
     this.props.selectModeFunc(mode)
   },
 
   render() {
     const { mapMode } = this.props
+    console.log("render MapSelection = ", mapMode)
     return (
       <div id="overlay-map-control">
         <div className='title-label'>Mode Selection</div>
@@ -40,11 +45,3 @@ export const MapSelection = React.createClass({
     )
   },
 })
-
-const mapStateToProps = state => {
-  return {
-    mapMode: state.mapMode,
-  }
-}
-
-export default connect(mapStateToProps, null)(MapSelection)

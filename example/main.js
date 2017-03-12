@@ -188,7 +188,6 @@ const ExampleApp = React.createClass({
     const { mapViewState, mapMode } = this.props
     const { width, height } = this.state
     const isActiveOverlay = mapMode !== MapMode.NONE
-    console.log('isActiveOverlay = ', isActiveOverlay)
     return (
       <MapboxGLMap
         mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
@@ -213,6 +212,7 @@ const ExampleApp = React.createClass({
       mode: mapMode,
     }
     const mapSelectionProps = {
+      mapMode: this.props.mapMode,
       selectModeFunc: this._handleSelectMode
     }
     return (

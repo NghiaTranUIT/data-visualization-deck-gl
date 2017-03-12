@@ -61,8 +61,7 @@ export function reducer(state = INITIAL_STATE, action) {
       const lat = item.latitude
       const long = item.longitude
       return {
-        longitude: Number(long),
-        latitude: Number(lat),
+        position: [Number(long), Number(lat)]
       }
     })
     return {...state, trees}
