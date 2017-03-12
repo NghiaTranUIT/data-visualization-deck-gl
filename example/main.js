@@ -48,22 +48,20 @@ const ExampleApp = React.createClass({
 
   _effects: [new ReflectionEffect()],
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this._handleResize);
+  },
+
   componentWillMount() {
     this._handleResize();
     window.addEventListener('resize', this._handleResize);
 
-    // Load Flight Data
-    this._loadCsvFile(AIRPORT_DATA, (data)=>{
-      this.props.dispatch(loadAirport(data))
-      this._loadCsvFile(SMALL_FLIGHT_DATA, (data)=>{this.props.dispatch(loadFlightDataPoints(data))})
-    });
-
-    // Load Tree
-    this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
+    // Load data
+    this._loadData()
   },
 
-  componentWillUnmount() {
-    window.removeEventListener('resize', this._handleResize);
+  _loadData() {
+    // Need implement here
   },
 
   _loadCsvFile(path, onDataLoaded) {
@@ -92,79 +90,33 @@ const ExampleApp = React.createClass({
   },
 
   _renderFlightLayer() {
-    const {flightArcs, airports} = this.props
-    return [
-      new ArcLayer({
-        id: 'arc',
-        data: flightArcs,
-        strokeWidth: 3,
-        color: [88, 9, 124],
-      })
-    ];
+    // Need implement here
+    return null
   },
 
   _renderTreeLayer() {
-    const { trees } = this.props
-    return [
-      new ScreenGridLayer({
-        id: 'gird',
-        data: trees,
-        minColor: [0, 0, 0, 0],
-        unitWidth: 10,
-        unitHeight: 10,
-      })
-    ];
+    // Need implement here
+    return null
   },
 
   _renderFlightGLSLOverlay() {
+    // Need implement here
     return null
   },
 
   _renderFlightOverlay() {
-    const {flightArcs, airports, mapViewState} = this.props
-    const {width, height} = this.state
-    return (
-      <DeckGL
-        id="default-deckgl-overlay"
-        width={width}
-        height={height}
-        debug
-        {...mapViewState}
-        onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderFlightLayer()}
-        effects={this._effects}
-      />
-    );
+    // Need implement here
+    return null
   },
 
   _renderTreesOverlay() {
-    const { mapViewState, trees } = this.props
-    const { width, height } = this.state
-    return (
-      <DeckGL
-        id="default-deckgl-overlay"
-        width={width}
-        height={height}
-        debug
-        {...mapViewState}
-        onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderTreeLayer()}
-        effects={this._effects}
-      />
-    );
+    // Need implement here
+    return null
   },
 
   _renderTreesHeatMapOverlay() {
-    const { mapViewState, trees } = this.props
-    const { width, height } = this.state
-    return (
-      <HeatmapOverlay
-        locations={trees}
-        {...mapViewState}
-        width={width}
-        height={height}
-        lngLatAccessor={(tree) => [tree['position'][0], tree['position'][1]]}/>
-    )
+    // Need implement here
+    return null
   },
 
   _renderVisualizationOverlay() {
@@ -186,22 +138,8 @@ const ExampleApp = React.createClass({
   },
 
   _renderMap() {
-    const { mapViewState, mapMode } = this.props
-    const { width, height } = this.state
-    const isActiveOverlay = mapMode !== MapMode.NONE
-    return (
-      <MapboxGLMap
-        mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-        width={width}
-        height={height}
-        mapStyle='mapbox://styles/mapbox/dark-v9'
-        perspectiveEnabled
-        { ...mapViewState }
-        onChangeViewport={this._handleViewportChanged}>
-        {isActiveOverlay && this._renderVisualizationOverlay()}
-        <FPSStats isActive/>
-      </MapboxGLMap>
-    );
+    // Need implement here
+    return null
   },
 
   render() {
