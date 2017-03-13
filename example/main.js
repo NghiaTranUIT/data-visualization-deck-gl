@@ -35,11 +35,10 @@ import {ReflectionEffect} from '../src/experimental'
 import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
 import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
-import { ArcLayer,ScreenGridLayer } from '../src'
+import { ArcLayer,ScreenGridLayer, FlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
-import { TripsLayer } from './flight-layer/flight-layer'
 
 // ---- View ---- //
 const ExampleApp = React.createClass({
@@ -104,6 +103,22 @@ const ExampleApp = React.createClass({
     ];
   },
 
+  _renderFlightGLSLLayer() {
+    const {flightArcs, airports} = this.props
+    return [
+      new FlightLayer({
+        id: 'flight-trips',
+        data: flightArcs,
+        getPath: d => d.segments,
+        getColor: d => d.vendor === 0 ? [253,128,93] : [23,184,190],
+        opacity: 0.3,
+        strokeWidth: 2,
+        trailLength: 180,
+        currentTime: 1
+      })
+    ];
+  },
+
   _renderTreeLayer() {
     const { trees } = this.props
     return [
@@ -118,7 +133,20 @@ const ExampleApp = React.createClass({
   },
 
   _renderFlightGLSLOverlay() {
-    return null
+    const {flightArcs, airports, mapViewState} = this.props
+    const {width, height} = this.state
+    return (
+      <DeckGL
+        id="default-deckgl-overlay"
+        width={width}
+        height={height}
+        debug
+        {...mapViewState}
+        onWebGLInitialized={ this._onWebGLInitialized }
+        layers={this._renderFlightGLSLLayer()}
+        effects={this._effects}
+      />
+    );
   },
 
   _renderFlightOverlay() {

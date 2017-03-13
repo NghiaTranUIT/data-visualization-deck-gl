@@ -55,6 +55,8 @@ export function reducer(state = INITIAL_STATE, action) {
       return {
         sourcePosition: state.airports[originalAirport],
         targetPosition: state.airports[destinationAirport],
+        vendor: 0,
+        segments: [state.airports[originalAirport], state.airports[destinationAirport]]
       }
     })
     return {...state, flightArcs}

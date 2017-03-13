@@ -1,9 +1,10 @@
-import {assembleShaders} from '../../src/react/deckgl'
-import {Layer} from '../../src/lib/..'
-import {Model, Program, Geometry, glGetDebugInfo} from '../../src/react/webgl-renderer'
+import {Layer, assembleShaders} from '../../..';
+import {GL, Model, Geometry, Program, glGetDebugInfo} from 'luma.gl';
+import {readFileSync} from 'fs';
+import {join} from 'path';
 const glslify = require('glslify');
 
-export default class TripsLayer extends Layer {
+export default class FlightLayer extends Layer {
   constructor(opts) {
     super(opts);
   }
@@ -38,12 +39,16 @@ export default class TripsLayer extends Layer {
     this.updateUniforms();
   }
 
+  getShaders() {
+    return {
+      vs: readFileSync(join(__dirname, './flight-layer-vertex.glsl'), 'utf8'),
+      fs: readFileSync(join(__dirname, './flight-layer-fragment.glsl'), 'utf8')
+    };
+  }
+
   getModel(gl) {
     return new Model({
-      program: new Program(gl, assembleShaders(gl, {
-        vs: glslify('../glsl/flight-layer-vertex.glsl'),
-        fs: glslify('../glsl/flight-layer-fragment.glsl')
-      })),
+      program: new Program(gl, assembleShaders(gl, this.getShaders())),
       geometry: new Geometry({
         id: this.props.id,
         drawMode: 'LINES'
