@@ -88,9 +88,9 @@ const ExampleApp = React.createClass({
   startTweenTimer() {
     this._tween = new TWEEN.Tween({time: 0})
           .to({time: 3600}, 120000)
-          .onUpdate(()=>{
+          .onUpdate((data)=>{
             this.setState({
-              time: this
+              time: data
             })
           })
           .repeat(Infinity).start()
@@ -146,6 +146,7 @@ const ExampleApp = React.createClass({
 
   _renderFlightGLSLLayer() {
     const {flightArcs, airports} = this.props
+    const {time} = this.state
     return [
       new FlightLayer({
         id: 'flight-trips',
@@ -155,7 +156,7 @@ const ExampleApp = React.createClass({
         opacity: 0.3,
         strokeWidth: 2,
         trailLength: 180,
-        currentTime: this.state.time
+        currentTime: time
       })
     ];
   },
@@ -310,9 +311,13 @@ const ExampleApp = React.createClass({
   },
 
   _handleStopTimer() {
-    console.log("_handleStopTimer")
     if (this._tween !== null) {
       this._tween.stop()
+      this._tween = null
+
+      this.setState({
+        isStartedTimer: false
+      });
     }
   },
 })

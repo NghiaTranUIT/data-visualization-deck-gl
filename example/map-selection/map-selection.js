@@ -23,7 +23,6 @@ export const MapSelection = React.createClass({
 
   render() {
     const { mapMode, stopTimerFunc } = this.props
-    console.log("render MapSelection = ", mapMode)
     return (
       <div id="overlay-map-control">
         <div className='title-label'>Mode Selection</div>

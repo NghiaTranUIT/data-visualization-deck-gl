@@ -83,6 +83,7 @@ export default class FlightLayer extends Layer {
 
   updateUniforms() {
     const {opacity, trailLength, currentTime} = this.props;
+    console.log("currentTime = ", currentTime)
     this.setUniforms({
       opacity,
       trailLength,
