@@ -61,7 +61,7 @@ const ExampleApp = React.createClass({
     const { mapMode } = this.props
     const { isStartedTimer } = this.state
 
-    if (nextProps.mapMode === MapMode.FLIGHT_GLSL &&
+    if ((nextProps.mapMode === MapMode.FLIGHT || nextProps.mapMode === MapMode.FLIGHT_GLSL ) &&
         nextProps.mapMode !== mapMode &&
         isStartedTimer === false) {
       this.startTweenTimer()
@@ -146,12 +146,16 @@ const ExampleApp = React.createClass({
 
   _renderArcFlightLayer() {
     const {flightArcs, airports} = this.props
+    const {time} = this.state
     return [
       new ArcFlightLayer({
         id: 'arc-flight',
         data: flightArcs,
         strokeWidth: 3,
         color: [88, 9, 124],
+        trailLength: 0.25,
+        currentTime: time,
+        timestamp: 400 / 2000
       })
     ];
   },

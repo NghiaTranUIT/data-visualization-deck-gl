@@ -23,7 +23,7 @@ import {GL, Model, Geometry} from 'luma.gl';
 import {readFileSync} from 'fs';
 import {join} from 'path';
 
-const DEFAULT_COLOR = [0, 0, 255, 255];
+const DEFAULT_COLOR = [253, 128, 93, 255];
 
 const defaultGetSourcePosition = x => x.sourcePosition;
 const defaultGetTargetPosition = x => x.targetPosition;
@@ -58,6 +58,12 @@ export default class ArcFlightLayer extends Layer {
     });
   }
 
+  updateState({props, changeFlags: {dataChanged}}) {
+     if (dataChanged) {
+       this.state.attributeManager.invalidateAll();
+     }
+   }
+
   initializeState() {
     const {gl} = this.context;
     this.setState({model: this._createModel(gl)});
@@ -80,9 +86,15 @@ export default class ArcFlightLayer extends Layer {
 
   draw({uniforms}) {
     const {gl} = this.context;
+    const {trailLength, currentTime, timestamp} = this.props;
     const lineWidth = this.screenToDevicePixels(this.props.strokeWidth);
     gl.lineWidth(lineWidth);
-    this.state.model.render(uniforms);
+    console.log(currentTime);
+    this.state.model.render(Object.assign({}, uniforms, {
+      trailLength,
+      currentTime,
+      timestamp
+    }));
     // Setting line width back to 1 is here to workaround a Google Chrome bug
     // gl.clear() and gl.isEnabled() will return GL_INVALID_VALUE even with
     // correct parameter

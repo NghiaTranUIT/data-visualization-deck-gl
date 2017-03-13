@@ -11,7 +11,11 @@ attribute vec3 instancePickingColors;
 
 uniform float opacity;
 uniform float renderPickingBuffer;
+uniform float currentTime;
+uniform float trailLength;
+uniform float timestamp;
 
+varying float vTime;
 varying vec4 vColor;
 
 float paraboloid(vec2 source, vec2 target, float ratio) {
@@ -39,13 +43,12 @@ void main(void) {
     sqrt(vertex_height)
   );
 
-  gl_Position = project(vec4(p, 1.0));
+  // the magic de-flickering factor
+  vec4 shift = vec4(0., 0., mod(timestamp, trailLength) * 1e-4, 0.);
+  gl_Position = project(vec4(p, 1.0)) + shift;
 
-  vec4 color = mix(instanceSourceColors, instanceTargetColors, segmentRatio) / 255.;
-
-  vColor = mix(
-    vec4(color.rgb, color.a * opacity),
-    vec4(instancePickingColors / 255., 1.),
-    renderPickingBuffer
-  );
+  // Color
+  vColor = mix(instanceSourceColors, instanceTargetColors, segmentRatio) / 255.;
+  //vTime = 1.0 - (currentTime - timestamp) / trailLength;
+  vTime = 0.2;
 }
