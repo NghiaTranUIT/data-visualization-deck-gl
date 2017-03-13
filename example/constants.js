@@ -7,7 +7,9 @@ export const MapMode = {
   FLIGHT_GLSL:      'FLIGHT_GLSL'
 }
 
-export const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw'
+// Mabox Public keys
+// https://www.mapbox.com/studio/
+export const MAPBOX_ACCESS_TOKEN = '<insert-mapbox-public-key>'
 
 export const SMALL_FLIGHT_DATA = './example/data/flight-record-tiny.csv'
 
