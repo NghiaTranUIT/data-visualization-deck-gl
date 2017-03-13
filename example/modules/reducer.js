@@ -5,6 +5,11 @@ const SF_LOCATION = {
   longitude: -122.42694203247012,
 }
 
+const WA_LOCATION = {
+  latitude: 47.44298,
+  longitude: -122.32931,
+}
+
 const NY_LOCATION = {
   latitude: 40.70237278,
   longitude: -74.01143532,
@@ -42,8 +47,8 @@ export function reducer(state = INITIAL_STATE, action) {
 
     // Move to SF
     if (action.mode === MapMode.FLIGHT || action.mode === MapMode.FLIGHT_GLSL) {
-      mapViewState.latitude = SF_LOCATION.latitude
-      mapViewState.longitude = SF_LOCATION.longitude
+      mapViewState.latitude = WA_LOCATION.latitude
+      mapViewState.longitude = WA_LOCATION.longitude
     }
 
     return {...state, mapViewState, mapMode: action.mode}
@@ -55,8 +60,8 @@ export function reducer(state = INITIAL_STATE, action) {
       return {
         sourcePosition: state.airports[originalAirport],
         targetPosition: state.airports[destinationAirport],
-        vendor: 0,
-        segments: [state.airports[originalAirport], state.airports[destinationAirport]]
+        vendor: 1,
+        segments: linearInterpolation(state.airports[originalAirport], state.airports[destinationAirport], 10)
       }
     })
     return {...state, flightArcs}
@@ -85,4 +90,47 @@ export function reducer(state = INITIAL_STATE, action) {
   default:
     return state;
   }
+}
+
+export function linearInterpolation(start, end, count) {
+  let start_long = start[0]
+  let start_lat = start[1]
+  let end_long = end[0]
+  let end_lat = end[1]
+
+  let denta_long = (end_long - start_long) / count
+  let denta_lat = (end_lat - start_lat) / count
+
+  let segments = []
+  for (var i = 0; i < count; i++) {
+    let x = start_long + denta_long * i
+    let y = start_lat + denta_lat * i
+    let z = (50 * i) / 2000
+    let ptr = [x, y, z]
+    segments.push(ptr)
+  }
+  return segments
+}
+
+export function ziczacInterpolation(start, end, count) {
+  let start_long = start[0]
+  let start_lat = start[1]
+  let end_long = end[0]
+  let end_lat = end[1]
+
+  let denta_long = (end_long - start_long) / count
+  let denta_lat = (end_lat - start_lat) / count
+
+  let segments = []
+  for (var i = 0; i < count; i++) {
+    let positive = i % 2 == 0 ? 1 : -1
+    let denta = denta_long * positive
+    let x = start_long + denta_long * i + denta
+    let y = start_lat + denta_lat * i
+    let z = (50 * i) / 2000
+    let ptr = [x, y, z]
+
+    segments.push(ptr)
+  }
+  return segments
 }

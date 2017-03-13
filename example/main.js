@@ -154,8 +154,8 @@ const ExampleApp = React.createClass({
         getPath: d => d.segments,
         getColor: d => d.vendor === 0 ? [253,128,93] : [23,184,190],
         opacity: 0.3,
-        strokeWidth: 2,
-        trailLength: 180,
+        strokeWidth: 10,
+        trailLength: 0.25,
         currentTime: time
       })
     ];

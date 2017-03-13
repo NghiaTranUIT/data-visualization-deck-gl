@@ -33,7 +33,9 @@ export default class FlightLayer extends Layer {
 
     gl.getExtension('OES_element_index_uint');
     this.setState({model});
-    gl.lineWidth(this.props.strokeWidth);
+
+    const lineWidth = this.screenToDevicePixels(this.props.strokeWidth);
+    gl.lineWidth(lineWidth);
 
     this.countVertices();
     this.updateUniforms();
