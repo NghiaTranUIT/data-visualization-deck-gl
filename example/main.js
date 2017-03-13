@@ -35,7 +35,7 @@ import {ReflectionEffect} from '../src/experimental'
 import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
 import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
-import { ArcLayer,ScreenGridLayer, FlightLayer } from '../src'
+import { ArcLayer,ScreenGridLayer, FlightLayer, ArcFlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
@@ -144,6 +144,18 @@ const ExampleApp = React.createClass({
     ];
   },
 
+  _renderArcFlightLayer() {
+    const {flightArcs, airports} = this.props
+    return [
+      new ArcFlightLayer({
+        id: 'arc-flight',
+        data: flightArcs,
+        strokeWidth: 3,
+        color: [88, 9, 124],
+      })
+    ];
+  },
+
   _renderFlightGLSLLayer() {
     const {flightArcs, airports} = this.props
     const {time} = this.state
@@ -202,7 +214,7 @@ const ExampleApp = React.createClass({
         debug
         {...mapViewState}
         onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderFlightLayer()}
+        layers={this._renderArcFlightLayer()}
         effects={this._effects}
       />
     );
