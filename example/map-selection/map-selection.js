@@ -9,6 +9,7 @@ export const MapSelection = React.createClass({
     // Weird why dispatch props didn't working
     // Temporary solution
     selectModeFunc: React.PropTypes.func,
+    stopTimerFunc: React.PropTypes.func,
   },
 
   _handleChangeChk(evt, mode) {
@@ -21,7 +22,7 @@ export const MapSelection = React.createClass({
   },
 
   render() {
-    const { mapMode } = this.props
+    const { mapMode, stopTimerFunc } = this.props
     console.log("render MapSelection = ", mapMode)
     return (
       <div id="overlay-map-control">
@@ -41,6 +42,7 @@ export const MapSelection = React.createClass({
         <div className='selection'>
           <input type="checkbox" checked={mapMode === MapMode.FLIGHT_GLSL} onChange={(evt)=>{this._handleChangeChk(evt, MapMode.FLIGHT_GLSL)}}/>
           Flight Record (GLSL)
+          <button onClick={stopTimerFunc}>Stop timer</button>
         </div>
       </div>
     )

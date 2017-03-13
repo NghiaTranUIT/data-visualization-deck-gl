@@ -284,7 +284,8 @@ const ExampleApp = React.createClass({
     }
     const mapSelectionProps = {
       mapMode: this.props.mapMode,
-      selectModeFunc: this._handleSelectMode
+      selectModeFunc: this._handleSelectMode,
+      stopTimerFunc: this._handleStopTimer,
     }
     return (
       <div>
@@ -308,6 +309,12 @@ const ExampleApp = React.createClass({
     this.props.dispatch(selectMode(mode))
   },
 
+  _handleStopTimer() {
+    console.log("_handleStopTimer")
+    if (this._tween !== null) {
+      this._tween.stop()
+    }
+  },
 })
 
 // redux states -> react props
