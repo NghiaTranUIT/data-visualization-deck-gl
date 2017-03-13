@@ -8,7 +8,7 @@ export const MapMode = {
 
 export const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw'
 
-export const SMALL_FLIGHT_DATA = './example/data/one-small-chuck-flight-data.csv'
+export const SMALL_FLIGHT_DATA = './example/data/very-small-chuck-flight-data.csv'
 
 export const AIRPORT_DATA = './example/data/airports.csv'
 

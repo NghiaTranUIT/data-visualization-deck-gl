@@ -102,7 +102,7 @@ export function linearInterpolation(start, end, count) {
   let denta_lat = (end_lat - start_lat) / count
 
   let segments = []
-  for (var i = 0; i < count; i++) {
+  for (var i = 0; i < count + 1; i++) {
     let x = start_long + denta_long * i
     let y = start_lat + denta_lat * i
     let z = (50 * i) / 2000
