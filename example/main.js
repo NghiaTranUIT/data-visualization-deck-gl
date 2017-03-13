@@ -39,6 +39,7 @@ import { ArcLayer,ScreenGridLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
+import { TripsLayer } from './flight-layer'
 
 // ---- View ---- //
 const ExampleApp = React.createClass({

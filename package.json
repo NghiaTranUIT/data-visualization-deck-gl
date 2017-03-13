@@ -33,6 +33,7 @@
     "geojson-normalize": "0.0.1",
     "get-pixels": "^3.3.0",
     "gl-matrix": "^2.3.2",
+    "glslify": "^6.0.1",
     "lodash.flattendeep": "^4.4.0",
     "luma.gl": "^2.10.4",
     "r-dom": "^2.3.2",
