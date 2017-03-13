@@ -39,6 +39,7 @@ import { ArcLayer,ScreenGridLayer, FlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
+var TWEEN = require('tween.js');
 
 // ---- View ---- //
 const ExampleApp = React.createClass({
@@ -47,6 +48,28 @@ const ExampleApp = React.createClass({
   },
 
   _effects: [new ReflectionEffect()],
+  _tween: null,
+
+  getInitialState() {
+    return {
+      time: 0,
+      isStartedTimer: false,
+    }
+  },
+
+  componentWillReceiveProps: function(nextProps) {
+    const { mapMode } = this.props
+    const { isStartedTimer } = this.state
+
+    if (nextProps.mapMode === MapMode.FLIGHT_GLSL &&
+        nextProps.mapMode !== mapMode &&
+        isStartedTimer === false) {
+      this.startTweenTimer()
+      this.setState({
+        isStartedTimer: true
+      })
+    }
+  },
 
   componentWillMount() {
     this._handleResize();
@@ -62,8 +85,26 @@ const ExampleApp = React.createClass({
     this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
   },
 
+  startTweenTimer() {
+    this._tween = new TWEEN.Tween({time: 0})
+          .to({time: 3600}, 120000)
+          .onUpdate(()=>{
+            this.setState({
+              time: this
+            })
+          })
+          .repeat(Infinity).start()
+    this.animate()
+  },
+
+  animate(time) {
+    window.requestAnimationFrame(this.animate)
+    TWEEN.update();
+  },
+
   componentWillUnmount() {
     window.removeEventListener('resize', this._handleResize);
+    this._tween.stop()
   },
 
   _loadCsvFile(path, onDataLoaded) {
@@ -114,7 +155,7 @@ const ExampleApp = React.createClass({
         opacity: 0.3,
         strokeWidth: 2,
         trailLength: 180,
-        currentTime: 1
+        currentTime: this.state.time
       })
     ];
   },

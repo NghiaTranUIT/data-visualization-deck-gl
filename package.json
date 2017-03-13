@@ -40,6 +40,7 @@
     "react-map-gl-heatmap-overlay": "^1.1.2",
     "save-pixels": "^2.3.0",
     "scss": "^0.2.4",
+    "tween": "^0.9.0",
     "viewport-mercator-project": "3.0.0-beta3"
   },
   "devDependencies": {
