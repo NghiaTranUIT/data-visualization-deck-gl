@@ -1,16 +1,9 @@
-import {Layer, assembleShaders} from 'deck.gl';
-import {Model, Program, Geometry, glGetDebugInfo} from 'luma.gl/headless';
-
+import {assembleShaders} from '../src/react/deckgl'
+import {Layer} from '../src/lib/..'
+import {Model, Program, Geometry, glGetDebugInfo} from '../src/react/webgl-renderer'
 const glslify = require('glslify');
 
 export default class TripsLayer extends Layer {
-  /**
-   * @classdesc
-   * LineLayer
-   *
-   * @class
-   * @param {object} opts
-   */
   constructor(opts) {
     super(opts);
   }
@@ -149,5 +142,4 @@ export default class TripsLayer extends Layer {
     }
     attribute.value = colors;
   }
-
 }
