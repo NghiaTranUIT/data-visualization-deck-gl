@@ -1,6 +1,6 @@
-import {assembleShaders} from '../src/react/deckgl'
-import {Layer} from '../src/lib/..'
-import {Model, Program, Geometry, glGetDebugInfo} from '../src/react/webgl-renderer'
+import {assembleShaders} from '../../src/react/deckgl'
+import {Layer} from '../../src/lib/..'
+import {Model, Program, Geometry, glGetDebugInfo} from '../../src/react/webgl-renderer'
 const glslify = require('glslify');
 
 export default class TripsLayer extends Layer {
@@ -41,8 +41,8 @@ export default class TripsLayer extends Layer {
   getModel(gl) {
     return new Model({
       program: new Program(gl, assembleShaders(gl, {
-        vs: glslify('./trips-layer-vertex.glsl'),
-        fs: glslify('./trips-layer-fragment.glsl')
+        vs: glslify('../glsl/flight-layer-vertex.glsl'),
+        fs: glslify('../glsl/flight-layer-fragment.glsl')
       })),
       geometry: new Geometry({
         id: this.props.id,
