@@ -6,7 +6,8 @@ const float N = 49.0;
 attribute vec3 positions;
 attribute vec4 instanceSourceColors;
 attribute vec4 instanceTargetColors;
-attribute vec4 instancePositions;
+attribute vec3 instanceSourcePositions;
+attribute vec3 instanceTargetPositions;
 attribute vec3 instancePickingColors;
 
 uniform float opacity;
@@ -29,8 +30,8 @@ float paraboloid(vec2 source, vec2 target, float ratio) {
 }
 
 void main(void) {
-  vec2 source = preproject(instancePositions.xy);
-  vec2 target = preproject(instancePositions.zw);
+  vec2 source = preproject(instanceSourcePositions.xy);
+  vec2 target = preproject(instanceTargetPositions.xy);
 
   float segmentRatio = smoothstep(0.0, 1.0, positions.x / N);
 
@@ -44,11 +45,12 @@ void main(void) {
   );
 
   // the magic de-flickering factor
-  vec4 shift = vec4(0., 0., mod(timestamp, trailLength) * 1e-4, 0.);
+  float _timestamp = (positions.x * 25.0) / 2000.0;
+  vec4 shift = vec4(0., 0., mod(_timestamp, trailLength) * 1e-4, 0.);
   gl_Position = project(vec4(p, 1.0)) + shift;
 
   // Color
   vColor = mix(instanceSourceColors, instanceTargetColors, segmentRatio) / 255.;
-  //vTime = 1.0 - (currentTime - timestamp) / trailLength;
-  vTime = 0.2;
+  vTime = 1.0 - (currentTime - _timestamp) / trailLength;
+  //vTime = 0.9;
 }

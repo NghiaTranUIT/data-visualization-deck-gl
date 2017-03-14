@@ -153,7 +153,7 @@ const ExampleApp = React.createClass({
         data: flightArcs,
         strokeWidth: 3,
         color: [88, 9, 124],
-        trailLength: 0.25,
+        trailLength: 0.5,
         currentTime: time,
         timestamp: 400 / 2000
       })
