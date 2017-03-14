@@ -41,6 +41,7 @@ import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DAT
 import { _renderTreesOverlay } from './overlays/tree_screengrid_overlay'
 import { _renderTreesHeatMapOverlay } from './overlays/tree_heatmap_overlay'
 import { _renderFlightOverlay } from './overlays/flight_overlay'
+import { _renderTaxiOverlay } from './overlays/taxi_overlay'
 
 var TWEEN = require('tween.js');
 
@@ -134,52 +135,6 @@ const ExampleApp = React.createClass({
     gl.depthFunc(gl.LEQUAL);
   },
 
-  _renderFlightLayer() {
-    const {flightArcs, airports} = this.props
-    return [
-      new ArcLayer({
-        id: 'arc',
-        data: flightArcs,
-        strokeWidth: 3,
-        color: [88, 9, 124],
-      })
-    ];
-  },
-
-  _renderFlightGLSLLayer() {
-    const {flightArcs, airports} = this.props
-    const {time} = this.state
-    return [
-      new FlightLayer({
-        id: 'flight-trips',
-        data: flightArcs,
-        getPath: d => d.segments,
-        getColor: d => d.vendor === 0 ? [253,128,93] : [23,184,190],
-        opacity: 0.3,
-        strokeWidth: 10,
-        trailLength: 0.25,
-        currentTime: time
-      })
-    ];
-  },
-
-  _renderFlightGLSLOverlay() {
-    const {flightArcs, airports, mapViewState} = this.props
-    const {width, height} = this.state
-    return (
-      <DeckGL
-        id="default-deckgl-overlay"
-        width={width}
-        height={height}
-        debug
-        {...mapViewState}
-        onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderFlightGLSLLayer()}
-        effects={this._effects}
-      />
-    );
-  },
-
   _renderVisualizationOverlay() {
     const { flightArcs, airports, mapMode, trees } = this.props
 
@@ -200,7 +155,7 @@ const ExampleApp = React.createClass({
         { mapMode === MapMode.TREES && _renderTreesOverlay(param) }
         { mapMode === MapMode.TREES_HEATMAP && _renderTreesHeatMapOverlay(param) }
         { mapMode === MapMode.FLIGHT && _renderFlightOverlay(param) }
-        { mapMode === MapMode.TAXI && this._renderFlightGLSLOverlay() }
+        { mapMode === MapMode.TAXI && _renderTaxiOverlay(param) }
       </div>
     )
   },
