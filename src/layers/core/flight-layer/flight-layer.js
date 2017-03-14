@@ -1,44 +1,106 @@
+// Copyright (c) 2015 Uber Technologies, Inc.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+// THE SOFTWARE.
+
 import {Layer, assembleShaders} from '../../..';
-import {GL, Model, Geometry, Program, glGetDebugInfo} from 'luma.gl';
+import {GL, Model, Geometry} from 'luma.gl';
 import {readFileSync} from 'fs';
 import {join} from 'path';
-const glslify = require('glslify');
+
+const DEFAULT_COLOR = [253, 128, 93, 255];
+
+const defaultGetSourcePosition = x => x.sourcePosition;
+const defaultGetTargetPosition = x => x.targetPosition;
+const defaultGetColor = x => x.color;
 
 export default class FlightLayer extends Layer {
-  constructor(opts) {
-    super(opts);
+
+  static layerName = 'FlightLayer';
+
+  /**
+   * @classdesc
+   * ArcLayer
+   *
+   * @class
+   * @param {object} props
+   */
+  constructor({
+    strokeWidth = 1,
+    getSourcePosition = defaultGetSourcePosition,
+    getTargetPosition = defaultGetTargetPosition,
+    getSourceColor = defaultGetColor,
+    getTargetColor = defaultGetColor,
+    ...props
+  } = {}) {
+    super({
+      strokeWidth,
+      getSourcePosition,
+      getTargetPosition,
+      getSourceColor,
+      getTargetColor,
+      ...props
+    });
   }
 
-  updateState({props, oldProps, changeFlags: {dataChanged, somethingChanged}}) {
-    const {attributeManager} = this.state;
-    if (dataChanged) {
-      this.countVertices(props.data);
-    }
-    if (somethingChanged) {
-      this.updateUniforms();
-    }
-  }
+  updateState({props, changeFlags: {dataChanged}}) {
+     if (dataChanged) {
+       this.state.attributeManager.invalidateAll();
+     }
+   }
 
   initializeState() {
     const {gl} = this.context;
+    this.setState({model: this._createModel(gl)});
+
     const {attributeManager} = this.state;
-
-    const model = this.getModel(gl);
-
-    attributeManager.addDynamic({
-      indices: {size: 1, update: this.calculateIndices, isIndexed: true},
-      positions: {size: 3, update: this.calculatePositions},
-      colors: {size: 3, update: this.calculateColors}
+    attributeManager.addInstanced({
+      instanceSourcePositions: {size: 3, update: this.calculateInstanceSourcePositions},
+      instanceTargetPositions: {size: 3, update: this.calculateInstanceTargetPositions},
+      instanceSourceColors: {
+        type: GL.UNSIGNED_BYTE,
+        size: 4,
+        update: this.calculateInstanceSourceColors
+      },
+      instanceTargetColors: {
+        type: GL.UNSIGNED_BYTE,
+        size: 4,
+        update: this.calculateInstanceTargetColors
+      }
     });
+  }
 
-    gl.getExtension('OES_element_index_uint');
-    this.setState({model});
-
+  draw({uniforms}) {
+    const {gl} = this.context;
+    const {trailLength, currentTime, timestamp} = this.props;
     const lineWidth = this.screenToDevicePixels(this.props.strokeWidth);
     gl.lineWidth(lineWidth);
-
-    this.countVertices();
-    this.updateUniforms();
+    console.log(currentTime);
+    this.state.model.render(Object.assign({}, uniforms, {
+      trailLength,
+      currentTime,
+      timestamp
+    }));
+    // Setting line width back to 1 is here to workaround a Google Chrome bug
+    // gl.clear() and gl.isEnabled() will return GL_INVALID_VALUE even with
+    // correct parameter
+    // This is not happening on Safari and Firefox
+    gl.lineWidth(1.0);
   }
 
   getShaders() {
@@ -48,109 +110,90 @@ export default class FlightLayer extends Layer {
     };
   }
 
-  getModel(gl) {
+  _createModel(gl) {
+    let positions = [];
+    const NUM_SEGMENTS = 50;
+    for (let i = 0; i < NUM_SEGMENTS; i++) {
+      positions = [...positions, i, i, i];
+    }
+
     return new Model({
-      program: new Program(gl, assembleShaders(gl, this.getShaders())),
+      gl,
+      ...assembleShaders(gl, this.getShaders()),
       geometry: new Geometry({
-        id: this.props.id,
-        drawMode: 'LINES'
+        drawMode: GL.LINE_STRIP,
+        positions: new Float32Array(positions)
       }),
-      vertexCount: 0,
-      isIndexed: true,
-      onBeforeRender: () => {
-        gl.enable(gl.BLEND);
-        gl.enable(gl.POLYGON_OFFSET_FILL);
-        gl.polygonOffset(2.0, 1.0);
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE);
-        gl.blendEquation(gl.FUNC_ADD);
-      },
-      onAfterRender: () => {
-        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-        gl.disable(gl.POLYGON_OFFSET_FILL);
-      }
+      isInstanced: true
     });
   }
 
-  countVertices(data) {
-    if (!data) {
-      return;
+  calculateInstancePositions(attribute) {
+    const {data, getSourcePosition, getTargetPosition} = this.props;
+    const {value, size} = attribute;
+    let i = 0;
+    for (const object of data) {
+      const sourcePosition = getSourcePosition(object);
+      const targetPosition = getTargetPosition(object);
+      value[i + 0] = sourcePosition[0];
+      value[i + 1] = sourcePosition[1];
+      value[i + 2] = targetPosition[0];
+      value[i + 3] = targetPosition[1];
+      i += size;
     }
-
-    const {getPath} = this.props;
-    let vertexCount = 0;
-    const pathLengths = data.reduce((acc, d) => {
-      const l = getPath(d).length;
-      vertexCount += l;
-      return [...acc, l];
-    }, []);
-    this.setState({pathLengths, vertexCount});
   }
 
-  updateUniforms() {
-    const {opacity, trailLength, currentTime} = this.props;
-    console.log("currentTime = ", currentTime)
-    this.setUniforms({
-      opacity,
-      trailLength,
-      currentTime
-    });
+  calculateInstanceSourcePositions(attribute) {
+    const {data, getSourcePosition, getTargetPosition} = this.props;
+    const {value, size} = attribute;
+    let i = 0;
+    for (const object of data) {
+      const sourcePosition = getSourcePosition(object);
+      value[i + 0] = sourcePosition[0];
+      value[i + 1] = sourcePosition[1];
+      value[i + 2] = 0;
+      i += size;
+    }
   }
 
-  calculateIndices(attribute) {
-    const {pathLengths, vertexCount} = this.state;
-
-    const indicesCount = (vertexCount - pathLengths.length) * 2;
-    const indices = new Uint32Array(indicesCount);
-
-    let offset = 0;
-    let index = 0;
-    for (let i = 0; i < pathLengths.length; i++) {
-      const l = pathLengths[i];
-      indices[index++] = offset;
-      for (let j = 1; j < l - 1; j++) {
-        indices[index++] = j + offset;
-        indices[index++] = j + offset;
-      }
-      indices[index++] = offset + l - 1;
-      offset += l;
+  calculateInstanceTargetPositions(attribute) {
+    const {data, getSourcePosition, getTargetPosition} = this.props;
+    const {value, size} = attribute;
+    let i = 0;
+    for (const object of data) {
+      const targetPosition = getTargetPosition(object);
+      value[i + 0] = targetPosition[0];
+      value[i + 1] = targetPosition[1];
+      value[i + 2] = 0;
+      i += size;
     }
-    attribute.value = indices;
-    this.state.model.setVertexCount(indicesCount);
   }
 
-  calculatePositions(attribute) {
-    const {data, getPath} = this.props;
-    const {vertexCount} = this.state;
-    const positions = new Float32Array(vertexCount * 3);
-
-    let index = 0;
-    for (let i = 0; i < data.length; i++) {
-      const path = getPath(data[i]);
-      for (let j = 0; j < path.length; j++) {
-        const pt = path[j];
-        positions[index++] = pt[0];
-        positions[index++] = pt[1];
-        positions[index++] = pt[2];
-      }
+  calculateInstanceSourceColors(attribute) {
+    const {data, getSourceColor} = this.props;
+    const {value, size} = attribute;
+    let i = 0;
+    for (const object of data) {
+      const color = getSourceColor(object) || DEFAULT_COLOR;
+      value[i + 0] = color[0];
+      value[i + 1] = color[1];
+      value[i + 2] = color[2];
+      value[i + 3] = isNaN(color[3]) ? DEFAULT_COLOR[3] : color[3];
+      i += size;
     }
-    attribute.value = positions;
   }
 
-  calculateColors(attribute) {
-    const {data, getColor} = this.props;
-    const {pathLengths, vertexCount} = this.state;
-    const colors = new Float32Array(vertexCount * 3);
-
-    let index = 0;
-    for (let i = 0; i < data.length; i++) {
-      const color = getColor(data[i]);
-      const l = pathLengths[i];
-      for (let j = 0; j < l; j++) {
-        colors[index++] = color[0];
-        colors[index++] = color[1];
-        colors[index++] = color[2];
-      }
+  calculateInstanceTargetColors(attribute) {
+    const {data, getTargetColor} = this.props;
+    const {value, size} = attribute;
+    let i = 0;
+    for (const object of data) {
+      const color = getTargetColor(object) || DEFAULT_COLOR;
+      value[i + 0] = color[0];
+      value[i + 1] = color[1];
+      value[i + 2] = color[2];
+      value[i + 3] = isNaN(color[3]) ? DEFAULT_COLOR[3] : color[3];
+      i += size;
     }
-    attribute.value = colors;
   }
 }

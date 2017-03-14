@@ -16,6 +16,10 @@ export function loadTrees(data) {
   return {type: 'LOAD_TREES', data}
 }
 
+export function loadTaxiTrip(data) {
+  return {type: 'LOAD_TAXI_TRIP', data}
+}
+
 export function selectMode(mode) {
   return {type: 'SELECT_MODE', mode}
 }
