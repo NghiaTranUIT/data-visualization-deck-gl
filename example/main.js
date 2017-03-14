@@ -55,26 +55,16 @@ const ExampleApp = React.createClass({
     this._handleResize();
     window.addEventListener('resize', this._handleResize);
 
-    // Load Flight Data
-    this._loadCsvFile(AIRPORT_DATA, (data)=>{
-      this.props.dispatch(loadAirport(data))
-      this._loadCsvFile(FLIGHT_DATA, (data)=>{this.props.dispatch(loadFlightDataPoints(data))})
-    });
+    // Load Data
+    this.loadData()
+  },
 
-    // Load Tree
-    this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
+  loadData() {
+    // Implement Timer here
   },
 
   startTweenTimer() {
-    this._tween = new TWEEN.Tween({time: 0})
-          .to({time: 3600}, 120000)
-          .onUpdate((data)=>{
-            this.setState({
-              time: data
-            })
-          })
-          .repeat(Infinity).start()
-    this.animate()
+    // Implement Timer here
   },
 
   animate(time) {
@@ -138,22 +128,8 @@ const ExampleApp = React.createClass({
   },
 
   _renderMap() {
-    const { mapViewState, mapMode } = this.props
-    const { width, height } = this.state
-    const isActiveOverlay = mapMode !== MapMode.NONE
-    return (
-      <MapboxGLMap
-        mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
-        width={width}
-        height={height}
-        mapStyle='mapbox://styles/mapbox/dark-v9'
-        perspectiveEnabled
-        { ...mapViewState }
-        onChangeViewport={this._handleViewportChanged}>
-        {isActiveOverlay && this._renderVisualizationOverlay()}
-        <FPSStats isActive/>
-      </MapboxGLMap>
-    );
+    // Implement here
+    return null
   },
 
   render() {

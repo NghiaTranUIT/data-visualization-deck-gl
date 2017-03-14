@@ -55,34 +55,17 @@ export function reducer(state = INITIAL_STATE, action) {
     return {...state, mapViewState, mapMode: action.mode}
 
   case 'LOAD_FLIGHT_POINT': {
-    const flightArcs = action.points.map((item)=>{
-      const originalAirport = item.ORIGIN_AIRPORT
-      const destinationAirport = item.DESTINATION_AIRPORT
-      return {
-        sourcePosition: state.airports[originalAirport],
-        targetPosition: state.airports[destinationAirport],
-      }
-    })
+    const flightArcs = []
     return {...state, flightArcs}
   }
 
   case 'LOAD_AIRPORT': {
     let airports = {}
-    action.airports.forEach((item, index)=>{
-      airports[item.IATA_CODE] = [Number(item.LONGITUDE), Number(item.LATITUDE)]
-    })
-
     return {...state, airports}
   }
 
   case 'LOAD_TREES': {
-    let trees = action.data.map((item)=>{
-      const lat = item.latitude
-      const long = item.longitude
-      return {
-        position: [Number(long), Number(lat)]
-      }
-    })
+    let trees = []
     return {...state, trees}
   }
 
