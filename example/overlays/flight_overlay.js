@@ -1,6 +1,6 @@
 import React from 'react'
 import DeckGL from '../../src/react/deckgl'
-import { ArcFlightLayer } from '../../src'
+import { FlightLayer } from '../../src'
 
 export function _renderFlightOverlay(param) {
     const {flightArcs, airports, mapViewState} = param.props
@@ -13,17 +13,17 @@ export function _renderFlightOverlay(param) {
         debug
         {...mapViewState}
         onWebGLInitialized={ param._onWebGLInitialized }
-        layers={_renderArcFlightLayer(param)}
+        layers={_renderFlightLayer(param)}
         effects={param._effects}
       />
     );
   }
 
-  function _renderArcFlightLayer(param) {
+  function _renderFlightLayer(param) {
     const {flightArcs, airports} = param.props
     const {time} = param.state
     return [
-      new ArcFlightLayer({
+      new FlightLayer({
         id: 'arc-flight',
         data: flightArcs,
         strokeWidth: 3,

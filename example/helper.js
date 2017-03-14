@@ -1,82 +1,42 @@
-export function processHexagons(hexagons) {
-  const values = hexagons.map(hexagon => Number(hexagon.value));
-  const maxValue = Math.max(...values);
+export function linearInterpolation(start, end, count) {
+  let start_long = start[0]
+  let start_lat = start[1]
+  let end_long = end[0]
+  let end_lat = end[1]
 
-  const data = hexagons.map(hexagon => ({
-    centroid: [
-      hexagon['centroid.x'],
-      hexagon['centroid.y']
-    ],
-    vertices: [
-      [Number(hexagon['v0.x']), Number(hexagon['v0.y'])],
-      [Number(hexagon['v1.x']), Number(hexagon['v1.y'])],
-      [Number(hexagon['v2.x']), Number(hexagon['v2.y'])],
-      [Number(hexagon['v3.x']), Number(hexagon['v3.y'])],
-      [Number(hexagon['v4.x']), Number(hexagon['v4.y'])],
-      [Number(hexagon['v5.x']), Number(hexagon['v5.y'])]
-    ],
-    color: [
-      Number(hexagon.value) / maxValue * 255,
-      Number(hexagon.value) / maxValue * 128,
-      Number(hexagon.value) / maxValue * 64
-    ],
-    elevation: Number(hexagon.value) / maxValue
+  let denta_long = (end_long - start_long) / count
+  let denta_lat = (end_lat - start_lat) / count
 
-  }));
-  return data;
+  let segments = []
+  for (var i = 0; i < count + 1; i++) {
+    let x = start_long + denta_long * i
+    let y = start_lat + denta_lat * i
+    let z = (50 * i) / 2000
+    let ptr = [x, y, z]
+    segments.push(ptr)
+  }
+  return segments
 }
 
-export function pointsToArcs(points) {
-  return points.map((point, i) => {
-    if (i === points.length - 1) {
-      return {
-        sourcePosition: [0, 0],
-        targetPosition: [0, 0],
-        color: [35, 81, 128]
-      };
-    }
+export function ziczacInterpolation(start, end, count) {
+  let start_long = start[0]
+  let start_lat = start[1]
+  let end_long = end[0]
+  let end_lat = end[1]
 
-    const source = point;
-    const target = points[i + 1];
+  let denta_long = (end_long - start_long) / count
+  let denta_lat = (end_lat - start_lat) / count
 
-    return {
-      sourcePosition: source.position,
-      targetPosition: target.position,
-      color: [
-        i % 255,
-        255 - i % 255,
-        Math.floor(i / 255) % 255,
-        255
-      ]
-    };
-  });
-}
+  let segments = []
+  for (var i = 0; i < count; i++) {
+    let positive = i % 2 == 0 ? 1 : -1
+    let denta = denta_long * positive
+    let x = start_long + denta_long * i + denta
+    let y = start_lat + denta_lat * i
+    let z = (50 * i) / 2000
+    let ptr = [x, y, z]
 
-export function pointsToLines(points) {
-  return points.map((point, i) => {
-    if (i === points.length - 1) {
-      return {
-        sourcePosition: [0, 0, 0],
-        targetPosition: [0, 0, 0],
-        color: [35, 81, 128]
-      };
-    }
-
-    const source = point;
-    const target = points[i + 1];
-
-    return {
-      sourcePosition: [
-        source.position[0],
-        source.position[1],
-        Math.random() * 1000
-      ],
-      targetPosition: [
-        target.position[0],
-        target.position[1],
-        Math.random() * 1000
-      ],
-      color: [0, 0, 255]
-    };
-  });
+    segments.push(ptr)
+  }
+  return segments
 }

@@ -4,4 +4,3 @@ export {default as LineLayer} from './line-layer';
 export {default as ScatterplotLayer} from './scatterplot-layer';
 export {default as ScreenGridLayer} from './screen-grid-layer';
 export {default as FlightLayer} from './flight-layer';
-export {default as ArcFlightLayer} from './arc-flight-layer';

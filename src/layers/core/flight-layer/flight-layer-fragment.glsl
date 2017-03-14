@@ -1,4 +1,4 @@
-#define SHADER_NAME trips-layer-fragment-shader
+#define SHADER_NAME flight-layer-fragment-shader
 
 #ifdef GL_ES
 precision highp float;

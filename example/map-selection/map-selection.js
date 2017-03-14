@@ -41,8 +41,7 @@ export const MapSelection = React.createClass({
         </div>
         <div className='selection'>
           <input type="checkbox" checked={mapMode === MapMode.TAXI} onChange={(evt)=>{this._handleChangeChk(evt, MapMode.TAXI)}}/>
-          Taxi (Animation)
-          <button onClick={stopTimerFunc}>Stop timer</button>
+          Taxi (Part-2 😉)
         </div>
       </div>
     )

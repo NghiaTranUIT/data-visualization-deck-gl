@@ -1,26 +1,4 @@
-// Copyright (c) 2015 Uber Technologies, Inc.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-// THE SOFTWARE.
-/* eslint-disable func-style */
-/* eslint-disable no-console */
-/* global console, process */
-/* global document, window */
+
 import 'babel-polyfill'
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -34,10 +12,9 @@ import DeckGL from '../src/react/deckgl'
 import {ReflectionEffect} from '../src/experimental'
 import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
-import { ArcLayer, FlightLayer, ArcFlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
-import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
+import { MAPBOX_ACCESS_TOKEN, MapMode, FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
 import { _renderTreesOverlay } from './overlays/tree_screengrid_overlay'
 import { _renderTreesHeatMapOverlay } from './overlays/tree_heatmap_overlay'
 import { _renderFlightOverlay } from './overlays/flight_overlay'
@@ -81,7 +58,7 @@ const ExampleApp = React.createClass({
     // Load Flight Data
     this._loadCsvFile(AIRPORT_DATA, (data)=>{
       this.props.dispatch(loadAirport(data))
-      this._loadCsvFile(SMALL_FLIGHT_DATA, (data)=>{this.props.dispatch(loadFlightDataPoints(data))})
+      this._loadCsvFile(FLIGHT_DATA, (data)=>{this.props.dispatch(loadFlightDataPoints(data))})
     });
 
     // Load Tree
@@ -233,6 +210,7 @@ function mapStateToProps(state) {
     flightArcs: state.flightArcs,
     airports: state.airports,
     trees: state.trees,
+    taxi: state.taxi,
     mapMode: state.mapMode,
   }
 }
