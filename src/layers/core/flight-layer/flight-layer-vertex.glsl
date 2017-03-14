@@ -30,27 +30,8 @@ float paraboloid(vec2 source, vec2 target, float ratio) {
 }
 
 void main(void) {
-  vec2 source = preproject(instanceSourcePositions.xy);
-  vec2 target = preproject(instanceTargetPositions.xy);
+  gl_Position = vec4(instanceSourcePositions, 1.0)
 
-  float segmentRatio = smoothstep(0.0, 1.0, positions.x / N);
+  // Implement here
 
-  float vertex_height = paraboloid(source, target, segmentRatio);
-  if (vertex_height < 0.0) vertex_height = 0.0;
-  vec3 p = vec3(
-    // xy: linear interpolation of source & target
-    mix(source, target, segmentRatio),
-    // z: paraboloid interpolate of source & target
-    sqrt(vertex_height)
-  );
-
-  // the magic de-flickering factor
-  float _timestamp = (positions.x * 15.0) / 2000.0;
-  vec4 shift = vec4(0., 0., mod(_timestamp, trailLength) * 1e-4, 0.);
-  gl_Position = project(vec4(p, 1.0)) + shift;
-
-  // Color
-  vColor = mix(instanceSourceColors, instanceTargetColors, segmentRatio) / 255.;
-  vTime = 1.0 - (currentTime - _timestamp) / trailLength;
-  //vTime = 0.9;
 }
