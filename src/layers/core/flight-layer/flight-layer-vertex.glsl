@@ -45,7 +45,7 @@ void main(void) {
   );
 
   // the magic de-flickering factor
-  float _timestamp = (positions.x * 25.0) / 2000.0;
+  float _timestamp = (positions.x * 15.0) / 2000.0;
   vec4 shift = vec4(0., 0., mod(_timestamp, trailLength) * 1e-4, 0.);
   gl_Position = project(vec4(p, 1.0)) + shift;
 
