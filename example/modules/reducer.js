@@ -46,7 +46,7 @@ export function reducer(state = INITIAL_STATE, action) {
     }
 
     // Move to SF
-    if (action.mode === MapMode.FLIGHT || action.mode === MapMode.FLIGHT_GLSL) {
+    if (action.mode === MapMode.FLIGHT || action.mode === MapMode.TAXI) {
       mapViewState.latitude = WA_LOCATION.latitude
       mapViewState.longitude = WA_LOCATION.longitude
     }

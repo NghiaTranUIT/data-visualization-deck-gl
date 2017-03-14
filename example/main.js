@@ -39,6 +39,8 @@ import { ArcLayer,ScreenGridLayer, FlightLayer, ArcFlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
+import { _renderTreesOverlay } from './overlays/tree_screengrid_overlay'
+
 var TWEEN = require('tween.js');
 
 // ---- View ---- //
@@ -61,9 +63,8 @@ const ExampleApp = React.createClass({
     const { mapMode } = this.props
     const { isStartedTimer } = this.state
 
-    if ((nextProps.mapMode === MapMode.FLIGHT || nextProps.mapMode === MapMode.FLIGHT_GLSL ) &&
-        nextProps.mapMode !== mapMode &&
-        isStartedTimer === false) {
+    if ((nextProps.mapMode === MapMode.FLIGHT || nextProps.mapMode === MapMode.TAXI ) &&
+        nextProps.mapMode !== mapMode && isStartedTimer === false) {
       this.startTweenTimer()
       this.setState({
         isStartedTimer: true
@@ -177,19 +178,6 @@ const ExampleApp = React.createClass({
     ];
   },
 
-  _renderTreeLayer() {
-    const { trees } = this.props
-    return [
-      new ScreenGridLayer({
-        id: 'gird',
-        data: trees,
-        minColor: [0, 0, 0, 0],
-        unitWidth: 10,
-        unitHeight: 10,
-      })
-    ];
-  },
-
   _renderFlightGLSLOverlay() {
     const {flightArcs, airports, mapViewState} = this.props
     const {width, height} = this.state
@@ -224,23 +212,6 @@ const ExampleApp = React.createClass({
     );
   },
 
-  _renderTreesOverlay() {
-    const { mapViewState, trees } = this.props
-    const { width, height } = this.state
-    return (
-      <DeckGL
-        id="default-deckgl-overlay"
-        width={width}
-        height={height}
-        debug
-        {...mapViewState}
-        onWebGLInitialized={ this._onWebGLInitialized }
-        layers={this._renderTreeLayer()}
-        effects={this._effects}
-      />
-    );
-  },
-
   _renderTreesHeatMapOverlay() {
     const { mapViewState, trees } = this.props
     const { width, height } = this.state
@@ -262,12 +233,19 @@ const ExampleApp = React.createClass({
       return []
     }
 
+    const param = {
+      props: this.props,
+      state: this.state,
+      onWebGLInitialized: this._onWebGLInitialized,
+      effects: this._effects,
+    }
+
     return (
       <div>
-        { mapMode === MapMode.TREES && this._renderTreesOverlay() }
+        { mapMode === MapMode.TREES && _renderTreesOverlay(param) }
         { mapMode === MapMode.TREES_HEATMAP && this._renderTreesHeatMapOverlay() }
         { mapMode === MapMode.FLIGHT && this._renderFlightOverlay() }
-        { mapMode === MapMode.FLIGHT_GLSL && this._renderFlightGLSLOverlay() }
+        { mapMode === MapMode.TAXI && this._renderFlightGLSLOverlay() }
       </div>
     )
   },

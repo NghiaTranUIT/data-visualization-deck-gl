@@ -36,11 +36,12 @@ export const MapSelection = React.createClass({
         </div>
         <div className='selection'>
           <input type="checkbox" checked={mapMode === MapMode.FLIGHT} onChange={(evt)=>{this._handleChangeChk(evt, MapMode.FLIGHT)}}/>
-          Flight Record
+          Flight (Animation)
+          <button onClick={stopTimerFunc}>Stop timer</button>
         </div>
         <div className='selection'>
-          <input type="checkbox" checked={mapMode === MapMode.FLIGHT_GLSL} onChange={(evt)=>{this._handleChangeChk(evt, MapMode.FLIGHT_GLSL)}}/>
-          Flight Record (GLSL)
+          <input type="checkbox" checked={mapMode === MapMode.TAXI} onChange={(evt)=>{this._handleChangeChk(evt, MapMode.TAXI)}}/>
+          Taxi (Animation)
           <button onClick={stopTimerFunc}>Stop timer</button>
         </div>
       </div>

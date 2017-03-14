@@ -3,7 +3,7 @@ export const MapMode = {
   TREES:            'TREES',
   TREES_HEATMAP:    'TREES_HEATMAP',
   FLIGHT:           'FLIGHT',
-  FLIGHT_GLSL:      'FLIGHT_GLSL'
+  TAXI:             'TAXI'
 }
 
 export const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoibmdoaWF0cmFuIiwiYSI6ImNpenhxcjBsejAxc2EycXFycTAzbjBqMHYifQ.lrdb9bCOiTpOjcO254IQBw'
