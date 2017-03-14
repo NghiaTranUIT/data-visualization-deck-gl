@@ -34,13 +34,12 @@ import DeckGL from '../src/react/deckgl'
 import {ReflectionEffect} from '../src/experimental'
 import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
-import HeatmapOverlay from 'react-map-gl-heatmap-overlay'
-import { ArcLayer,ScreenGridLayer, FlightLayer, ArcFlightLayer } from '../src'
+import { ArcLayer, FlightLayer, ArcFlightLayer } from '../src'
 import { MapSelection } from './map-selection/map-selection'
 import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
 import { MAPBOX_ACCESS_TOKEN, MapMode, SMALL_FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
 import { _renderTreesOverlay } from './overlays/tree_screengrid_overlay'
-
+import { _renderTreesHeatMapOverlay } from './overlays/tree_heatmap_overlay'
 var TWEEN = require('tween.js');
 
 // ---- View ---- //
@@ -212,19 +211,6 @@ const ExampleApp = React.createClass({
     );
   },
 
-  _renderTreesHeatMapOverlay() {
-    const { mapViewState, trees } = this.props
-    const { width, height } = this.state
-    return (
-      <HeatmapOverlay
-        locations={trees}
-        {...mapViewState}
-        width={width}
-        height={height}
-        lngLatAccessor={(tree) => [tree['position'][0], tree['position'][1]]}/>
-    )
-  },
-
   _renderVisualizationOverlay() {
     const { flightArcs, airports, mapMode, trees } = this.props
 
@@ -243,7 +229,7 @@ const ExampleApp = React.createClass({
     return (
       <div>
         { mapMode === MapMode.TREES && _renderTreesOverlay(param) }
-        { mapMode === MapMode.TREES_HEATMAP && this._renderTreesHeatMapOverlay() }
+        { mapMode === MapMode.TREES_HEATMAP && _renderTreesHeatMapOverlay(param) }
         { mapMode === MapMode.FLIGHT && this._renderFlightOverlay() }
         { mapMode === MapMode.TAXI && this._renderFlightGLSLOverlay() }
       </div>
