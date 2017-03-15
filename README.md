@@ -2,7 +2,7 @@
 An crazy experiement for demonstrating data visualization.
   
 # Youtube
--[![Data Visualization](https://github.com/NghiaTranUIT/data-visualization-deck-gl/blob/master/Data-visualization-thumbnail?raw=true)](https://www.youtube.com/watch?v=kgcJ0rftIUA "Data Visualization")
+[![Data Visualization](https://github.com/NghiaTranUIT/data-visualization-deck-gl/blob/master/Data-visualization-thumbnail?raw=true)](https://www.youtube.com/watch?v=kgcJ0rftIUA "Data Visualization")
 [Youtube](https://www.youtube.com/watch?v=kgcJ0rftIUA)
   
 # Blog
