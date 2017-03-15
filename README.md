@@ -1,13 +1,11 @@
 # Data Visualization 
 An crazy experiement for demonstrating data visualization.
- 
+  
 # Youtube
-[![Data Visualization](https://github.com/NghiaTranUIT/data-visualization-deck-gl/blob/master/Data-visualization-thumbnail?raw=true)](https://www.youtube.com/watch?v=kgcJ0rftIUA "Data Visualization")
 [Youtube](https://www.youtube.com/watch?v=kgcJ0rftIUA)
   
 # Blog
-I'm working on new series of blog for data visualization 🤗  
-Will publish it soon (maybe 2-3 days)  
+I spent a week to write blog about [Deck.gl - Data Visualization](http://nghiatran.me/deck-gl-data-visualization/)  
 Keep in touch with me at [nghiatran.me](http://nghiatran.me)  
 
 # Data
