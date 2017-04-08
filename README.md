@@ -15,6 +15,14 @@ All data I downloaded from [Kaggle](https://www.kaggle.com)
 [2015 Flight delay and cancellation](https://www.kaggle.com/usdot/flight-delays)  
 Both are released under CC0: Public Domain License. I could do whatever I like 🤗  
   
+# Installation
+Navigate to root folder and run scrip
+
+```
+yarn install
+yarn start
+```
+
 # Technologies
 - Mapbox
 - React-map-gl
