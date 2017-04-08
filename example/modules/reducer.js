@@ -41,13 +41,13 @@ export function reducer(state = INITIAL_STATE, action) {
   const mapViewState = state.mapViewState
 
     // Move to NY
-    if (action.mode === MapMode.TREES || action.mode === MapMode.TREES_HEATMAP) {
+    if (action.mode === MapMode.TREES || action.mode === MapMode.TREES_HEATMAP || action.mode === MapMode.TAXI) {
       mapViewState.latitude = NY_LOCATION.latitude
       mapViewState.longitude = NY_LOCATION.longitude
     }
 
     // Move to SF
-    if (action.mode === MapMode.FLIGHT || action.mode === MapMode.TAXI) {
+    if (action.mode === MapMode.FLIGHT) {
       mapViewState.latitude = WA_LOCATION.latitude
       mapViewState.longitude = WA_LOCATION.longitude
     }

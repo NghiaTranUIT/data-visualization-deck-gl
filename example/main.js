@@ -63,6 +63,9 @@ const ExampleApp = React.createClass({
 
     // Load Tree
     this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
+
+    // Load Taxi trip
+
   },
 
   startTweenTimer() {

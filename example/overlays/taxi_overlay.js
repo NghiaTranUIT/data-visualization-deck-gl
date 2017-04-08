@@ -20,7 +20,22 @@ export function _renderTaxiOverlay(param) {
   }
 
 function _renderTaxiTripLayer(param) {
-  return []
+  const { taxi } = param.props
+  const { time } = param.state
+
+  return [
+    new TripsLayer({
+      id: 'trips',
+      data: taxi,
+      getPath: d => d.segments,
+      getColor: d => d.vendor === 0 ? [253, 128, 93] : [23, 184, 190],
+      opacity: 0.3,
+      strokeWidth: 2,
+      trailLength: 120,
+      currentTime: time
+    }),
+  ]
+
 }
 
 function _renderBuildingLayer(param) {

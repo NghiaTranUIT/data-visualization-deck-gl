@@ -14,4 +14,4 @@ export const AIRPORT_DATA = './example/data/airports.csv'
 
 export const TREE_DATA = './example/data/tree_census.csv'
 
-export const TAXI_TRIP_DATA = './example/data/taxi-trip.json'
+export const TAXI_TRIP_DATA = './example/data/trips.json'
