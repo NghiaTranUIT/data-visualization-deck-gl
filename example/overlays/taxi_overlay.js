@@ -1,10 +1,11 @@
 import React from 'react'
 import DeckGL from '../../src/react/deckgl'
+import { TaxiLayer } from '../../src'
 
 export function _renderTaxiOverlay(param) {
     const {flightArcs, airports, mapViewState} = param.props
     const {width, height} = param.state
-    const layers = []
+    const layers = _renderTaxiTripLayer(param)
     return (
       <DeckGL
         id="default-deckgl-overlay"
@@ -22,9 +23,8 @@ export function _renderTaxiOverlay(param) {
 function _renderTaxiTripLayer(param) {
   const { taxi } = param.props
   const { time } = param.state
-
   return [
-    new TripsLayer({
+    new TaxiLayer({
       id: 'trips',
       data: taxi,
       getPath: d => d.segments,

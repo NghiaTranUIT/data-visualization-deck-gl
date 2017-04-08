@@ -1,5 +1,5 @@
 import {Layer, assembleShaders} from '../../..';
-import {GL, Model, Geometry} from 'luma.gl';
+import {GL, Model, Geometry, Program} from 'luma.gl';
 import {readFileSync} from 'fs';
 import {join} from 'path';
 
@@ -14,18 +14,19 @@ export default class TaxiLayer extends Layer {
 
   initializeState() {
     const {gl} = this.context;
-    const {attributeManager} = this.state;
 
+    const {attributeManager} = this.state;
     const model = this.getModel(gl);
+    console.log("MODEL")
+    console.log(model)
+    gl.getExtension('OES_element_index_uint');
+    this.setState({model});
 
     attributeManager.add({
       indices: {size: 1, update: this.calculateIndices, isIndexed: true},
       positions: {size: 3, update: this.calculatePositions},
       colors: {size: 3, update: this.calculateColors}
     });
-
-    gl.getExtension('OES_element_index_uint');
-    this.setState({model});
   }
 
   updateState({props, changeFlags: {dataChanged}}) {
@@ -44,14 +45,13 @@ export default class TaxiLayer extends Layer {
 
   getModel(gl) {
     return new Model({
-      gl,
-      ...assembleShaders(gl, this.getShaders()),
+      program: new Program(gl, assembleShaders(gl, this.getShaders())),
       geometry: new Geometry({
-      id: this.props.id,
-      drawMode: 'LINES',
+        id: this.props.id,
+        drawMode: 'LINES'
+      }),
       vertexCount: 0,
       isIndexed: true,
-    }),
       onBeforeRender: () => {
         gl.enable(gl.BLEND);
         gl.enable(gl.POLYGON_OFFSET_FILL);
@@ -82,11 +82,20 @@ export default class TaxiLayer extends Layer {
   }
 
   draw({uniforms}) {
+    const {gl} = this.context;
     const {trailLength, currentTime} = this.props;
+    const lineWidth = this.screenToDevicePixels(this.props.strokeWidth);
+    gl.lineWidth(lineWidth);
+    console.log(currentTime);
     this.state.model.render(Object.assign({}, uniforms, {
       trailLength,
       currentTime
     }));
+    // Setting line width back to 1 is here to workaround a Google Chrome bug
+    // gl.clear() and gl.isEnabled() will return GL_INVALID_VALUE even with
+    // correct parameter
+    // This is not happening on Safari and Firefox
+    gl.lineWidth(1.0);
   }
 
   calculateIndices(attribute) {
@@ -116,6 +125,7 @@ export default class TaxiLayer extends Layer {
     const {vertexCount} = this.state;
     const positions = new Float32Array(vertexCount * 3);
 
+    console.log("calculatePositions = ", data)
     let index = 0;
     for (let i = 0; i < data.length; i++) {
       const path = getPath(data[i]);
