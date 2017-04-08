@@ -70,7 +70,7 @@ const ExampleApp = React.createClass({
 
   startTweenTimer() {
     this._tween = new TWEEN.Tween({time: 0})
-          .to({time: 3600}, 120000)
+          .to({time: 0}, 120000)
           .onUpdate((data)=>{
             this.setState({
               time: data

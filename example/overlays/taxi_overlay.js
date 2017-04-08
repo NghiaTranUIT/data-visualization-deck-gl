@@ -32,7 +32,7 @@ function _renderTaxiTripLayer(param) {
       opacity: 0.3,
       strokeWidth: 2,
       trailLength: 120,
-      currentTime: time
+      currentTime: time * 3600
     }),
   ]
 
