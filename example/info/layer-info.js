@@ -7,11 +7,12 @@ const LayerInfo = React.createClass({
     numberFlights: React.PropTypes.number,
     numberTrees: React.PropTypes.number,
     numberAirport: React.PropTypes.number,
+    numberTaxi: React.PropTypes.number,
     mode: React.PropTypes.string,
   },
 
   render() {
-    const { numberFlights, numberTrees, numberAirport } = this.props
+    const { numberFlights, numberTrees, numberAirport, numberTaxi } = this.props
     return (
       <div id="overlay-control">
         <div className="title-label">
@@ -22,6 +23,9 @@ const LayerInfo = React.createClass({
         </div>
         <div className="title-label">
           Airport: {numberAirport}
+        </div>
+        <div className="title-label">
+          Taxi: {numberTaxi}
         </div>
       </div>
     )

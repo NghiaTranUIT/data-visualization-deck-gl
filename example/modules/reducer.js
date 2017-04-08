@@ -87,7 +87,8 @@ export function reducer(state = INITIAL_STATE, action) {
   }
 
   case 'LOAD_TAXI_TRIP': {
-    return {...state}
+    const taxi = action.data
+    return {...state, taxi}
   }
 
   default:

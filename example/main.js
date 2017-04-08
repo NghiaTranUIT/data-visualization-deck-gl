@@ -13,8 +13,8 @@ import {ReflectionEffect} from '../src/experimental'
 import {interpolateViridis} from 'd3-scale'
 import { reducer } from './modules/reducer'
 import { MapSelection } from './map-selection/map-selection'
-import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode } from './modules/action'
-import { MAPBOX_ACCESS_TOKEN, MapMode, FLIGHT_DATA, AIRPORT_DATA, TREE_DATA} from './constants'
+import { updateMap, loadFlightDataPoints, loadAirport, loadTrees, selectMode, loadTaxiTrip } from './modules/action'
+import { MAPBOX_ACCESS_TOKEN, MapMode, FLIGHT_DATA, AIRPORT_DATA, TREE_DATA, TAXI_TRIP_DATA} from './constants'
 import { _renderTreesOverlay } from './overlays/tree_screengrid_overlay'
 import { _renderTreesHeatMapOverlay } from './overlays/tree_heatmap_overlay'
 import { _renderFlightOverlay } from './overlays/flight_overlay'
@@ -65,7 +65,7 @@ const ExampleApp = React.createClass({
     this._loadCsvFile(TREE_DATA, (data)=>{this.props.dispatch(loadTrees(data))})
 
     // Load Taxi trip
-
+    this._loadJSONFile(TAXI_TRIP_DATA, (data)=>{this.props.dispatch(loadTaxiTrip(data))})
   },
 
   startTweenTimer() {
@@ -99,6 +99,15 @@ const ExampleApp = React.createClass({
     });
   },
 
+  _loadJSONFile(path, onDataLoaded) {
+    request.json(path, function loadJson(error, data) {
+      if (error) {
+        console.error(error);
+      }
+      onDataLoaded(data);
+    });
+  },
+
   _handleResize() {
     this.setState({width: window.innerWidth, height: window.innerHeight});
   },
@@ -116,10 +125,10 @@ const ExampleApp = React.createClass({
   },
 
   _renderVisualizationOverlay() {
-    const { flightArcs, airports, mapMode, trees } = this.props
+    const { flightArcs, airports, mapMode, trees, taxi } = this.props
 
     // wait until data is ready before rendering
-    if (flightArcs === null|| airports === null || trees === null) {
+    if (flightArcs === null|| airports === null || trees === null || taxi === null) {
       return []
     }
 
@@ -160,11 +169,12 @@ const ExampleApp = React.createClass({
   },
 
   render() {
-    const { flightArcs, trees, mapMode, airports } = this.props
+    const { flightArcs, trees, mapMode, airports, taxi} = this.props
     const layerInfoProps = {
       numberFlights: this._getLength(flightArcs),
       numberTrees: this._getLength(trees),
       numberAirport: this._getLength(airports),
+      numberTaxi: this._getLength(taxi),
       mode: mapMode,
     }
     const mapSelectionProps = {
@@ -184,7 +194,7 @@ const ExampleApp = React.createClass({
   },
 
   _getLength(data) {
-    if (data === null) {
+    if (data === null || data === undefined) {
       return 0
     }
     return Object.keys(data).length
